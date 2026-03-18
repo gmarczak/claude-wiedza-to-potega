@@ -172,15 +172,15 @@ function App() {
           />
         ) : null;
       case 'pyramid_intro':
-        return pyramidIntro ? <PyramidIntro data={pyramidIntro} playerId={playerId} /> : null;
+        return pyramidIntro ? <PyramidIntro data={pyramidIntro} /> : null;
       case 'pyramid_question':
         return pyramidQuestion ? (
-          <PyramidQuestion data={pyramidQuestion} timeLeft={timeLeft} playerId={playerId}
+          <PyramidQuestion data={pyramidQuestion} timeLeft={timeLeft}
             onAnswer={(i) => socket.emit('game:pyramid-answer', i)}
           />
         ) : null;
       case 'pyramid_reveal':
-        return pyramidReveal ? <PyramidReveal data={pyramidReveal} playerId={playerId} /> : null;
+        return pyramidReveal ? <PyramidReveal data={pyramidReveal} /> : null;
       case 'finished':
         return result ? <FinishedScreen result={result} playerId={playerId} onPlayAgain={resetGame} onLeave={resetGame} /> : null;
       default:

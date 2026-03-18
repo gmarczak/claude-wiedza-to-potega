@@ -3,7 +3,7 @@ import type { PyramidIntroData, PyramidQuestionData, PyramidRevealData } from '.
 import { AVATARS } from '../types';
 
 // ===== PYRAMID INTRO =====
-export function PyramidIntro({ data, playerId }: { data: PyramidIntroData; playerId: string }) {
+export function PyramidIntro({ data }: { data: PyramidIntroData }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-900 via-orange-900 to-red-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md text-center animate-slide-up">
@@ -13,7 +13,6 @@ export function PyramidIntro({ data, playerId }: { data: PyramidIntroData; playe
         <div className="relative mx-auto" style={{ width: '280px', height: '300px' }}>
           {/* Pyramid visualization */}
           {Array.from({ length: data.pyramidSize + 1 }).map((_, level) => {
-            const y = 280 - level * (280 / data.pyramidSize);
             const width = 280 - level * (200 / data.pyramidSize);
             const playersAtLevel = data.players.filter((p) => p.startPosition === level);
 
@@ -57,8 +56,8 @@ export function PyramidIntro({ data, playerId }: { data: PyramidIntroData; playe
 }
 
 // ===== PYRAMID QUESTION =====
-export function PyramidQuestion({ data, timeLeft, playerId, onAnswer }: {
-  data: PyramidQuestionData; timeLeft: number; playerId: string; onAnswer: (i: number) => void;
+export function PyramidQuestion({ data, timeLeft, onAnswer }: {
+  data: PyramidQuestionData; timeLeft: number; onAnswer: (i: number) => void;
 }) {
   const [selected, setSelected] = useState<number | null>(null);
   const answerLabels = ['A', 'B', 'C', 'D'];
@@ -131,7 +130,7 @@ export function PyramidQuestion({ data, timeLeft, playerId, onAnswer }: {
 }
 
 // ===== PYRAMID REVEAL =====
-export function PyramidReveal({ data, playerId }: { data: PyramidRevealData; playerId: string }) {
+export function PyramidReveal({ data }: { data: PyramidRevealData }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-900 via-orange-900 to-red-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md text-center animate-slide-up">
