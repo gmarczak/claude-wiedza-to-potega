@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { MiniGameData, MiniGameResultsData } from '../types';
 import { AVATARS } from '../types';
+import { SFX } from '../sounds';
 
 interface Props {
   data: MiniGameData;
@@ -12,29 +13,27 @@ interface Props {
 
 export default function MiniGameScreen({ data, resultsData, timeLeft, playerId, onResult }: Props) {
   if (resultsData) {
-    const me = resultsData.players.find((p) => p.id === playerId);
-    const opp = resultsData.players.find((p) => p.id !== playerId);
-    const meAvatar = AVATARS.find((a) => a.id === me?.avatarId) || AVATARS[0];
-    const oppAvatar = AVATARS.find((a) => a.id === opp?.avatarId) || AVATARS[1];
-
+    const sorted = [...resultsData.players].sort((a, b) => b.miniGameScore - a.miniGameScore);
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md text-center animate-slide-up">
           <h2 className="text-2xl font-bold text-white mb-6">Wyniki Mini Gry</h2>
-          <div className="flex justify-around items-center bg-white/10 rounded-xl p-6 border border-white/20">
-            <div className="text-center">
-              <span className="text-3xl">{meAvatar.emoji}</span>
-              <div className="text-white font-semibold mt-2">{me?.name}</div>
-              <div className="text-2xl font-bold text-green-400">+{(me?.miniGameScore || 0) * 5}</div>
-              <div className="text-purple-300 text-xs">{me?.miniGameScore} trafień</div>
-            </div>
-            <div className="text-white/30 font-bold">VS</div>
-            <div className="text-center">
-              <span className="text-3xl">{oppAvatar.emoji}</span>
-              <div className="text-white font-semibold mt-2">{opp?.name}</div>
-              <div className="text-2xl font-bold text-green-400">+{(opp?.miniGameScore || 0) * 5}</div>
-              <div className="text-purple-300 text-xs">{opp?.miniGameScore} trafień</div>
-            </div>
+          <div className="space-y-3 stagger-children">
+            {sorted.map((p, i) => {
+              const avatar = AVATARS.find((a) => a.id === p.avatarId) || AVATARS[0];
+              const isMe = p.id === playerId;
+              return (
+                <div key={p.id} className={`flex items-center gap-3 p-4 bg-white/10 rounded-xl border ${isMe ? 'border-purple-400' : 'border-white/20'}`}>
+                  <span className="text-lg font-bold text-white/60 w-6">{i + 1}.</span>
+                  <span className="text-2xl">{avatar.emoji}</span>
+                  <div className="flex-1 text-left">
+                    <div className="text-white font-semibold">{p.name}</div>
+                    <div className="text-purple-300 text-xs">{p.miniGameScore} trafień</div>
+                  </div>
+                  <div className="text-xl font-bold text-green-400">+{p.miniGameScore * 5}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -69,6 +68,7 @@ function ConnectGame({ data, timeLeft, onResult }: { data: MiniGameData; timeLef
     if (!selectedLeft || matched.has(selectedLeft) || submitted) return;
     const pair = game.pairs.find((p) => p.left === selectedLeft && p.right === right);
     if (pair) {
+      SFX.miniGameCorrect();
       setMatched((prev) => new Set([...prev, selectedLeft!]));
       setScore((prev) => {
         const newScore = prev + 1;
@@ -159,9 +159,11 @@ function SortGame({ data, timeLeft, onResult }: { data: MiniGameData; timeLeft: 
     const item = shuffledItems[currentIndex];
     const correct = item.category === category;
     if (correct) {
+      SFX.miniGameCorrect();
       setScore((prev) => prev + 1);
       setLastResult('correct');
     } else {
+      SFX.miniGameWrong();
       setLastResult('wrong');
     }
 

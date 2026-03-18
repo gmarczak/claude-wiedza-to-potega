@@ -15,16 +15,21 @@ export const AVATARS: Avatar[] = [
   { id: 'ninja', name: 'Ninja', emoji: '🥷', color: '#6366f1' },
   { id: 'vampire', name: 'Wampir', emoji: '🧛', color: '#dc2626' },
   { id: 'astronaut', name: 'Astronauta', emoji: '👨‍🚀', color: '#0ea5e9' },
+  { id: 'dragon', name: 'Smok', emoji: '🐉', color: '#16a34a' },
+  { id: 'detective', name: 'Detektyw', emoji: '🕵️', color: '#78716c' },
+  { id: 'unicorn', name: 'Jednorożec', emoji: '🦄', color: '#e879f9' },
+  { id: 'ghost', name: 'Duch', emoji: '👻', color: '#94a3b8' },
 ];
 
 // ===== POWER-UPS (Zagrywki) =====
-export type PowerUpType = 'slime' | 'platypus' | 'ice' | 'bomb';
+export type PowerUpType = 'slime' | 'platypus' | 'ice' | 'bomb' | 'double' | 'fifty';
 
 export interface PowerUp {
   type: PowerUpType;
   name: string;
   description: string;
   emoji: string;
+  selfBuff?: boolean; // true = applies to self, false = attacks opponent
 }
 
 export const POWER_UPS: PowerUp[] = [
@@ -32,6 +37,8 @@ export const POWER_UPS: PowerUp[] = [
   { type: 'platypus', name: 'Dziobak', description: 'Zjada losowe litery z odpowiedzi przeciwnika', emoji: '🦆' },
   { type: 'ice', name: 'Lód', description: 'Zamraża ekran przeciwnika na 3 sekundy', emoji: '🧊' },
   { type: 'bomb', name: 'Bomba', description: 'Miesza kolejność odpowiedzi w trakcie pytania', emoji: '💣' },
+  { type: 'double', name: 'Podwójne Punkty', description: 'Zdobywasz podwójne punkty za tę rundę!', emoji: '✨', selfBuff: true },
+  { type: 'fifty', name: '50/50', description: 'Usuwa dwie błędne odpowiedzi z pytania', emoji: '✂️', selfBuff: true },
 ];
 
 // ===== QUESTIONS =====
@@ -119,7 +126,7 @@ export interface Room {
   availableCategories: string[];
   selectedCategory: string | null;
   // Power-ups for current round
-  currentPowerUps: Record<string, PowerUpType | null>; // playerId -> power used on opponent
+  currentPowerUps: Record<string, { type: PowerUpType; targetId: string } | null>; // playerId -> power used on target
   // Game structure: 3 rounds of questions, minigame, 3 rounds, minigame, 3 rounds, pyramid
   roundGroup: number; // 0, 1, 2 (which group of 3 questions)
   roundInGroup: number; // 0, 1, 2 (which question in the group)
@@ -155,6 +162,7 @@ export interface ServerToClientEvents {
   'game:question': (data: QuestionData) => void;
   'game:tick': (timeLeft: number) => void;
   'game:power-up-hit': (data: PowerUpHitData) => void;
+  'game:power-up-self': (data: PowerUpSelfData) => void;
   'game:reveal': (data: RevealData) => void;
   'game:minigame-start': (data: MiniGameData) => void;
   'game:minigame-results': (data: MiniGameResultsData) => void;
@@ -210,8 +218,7 @@ export interface CategoryResultData {
 
 export interface PowerUpPhaseData {
   availablePowerUps: PowerUp[];
-  opponentId: string;
-  opponentName: string;
+  opponents: { id: string; name: string }[];
   timeLimit: number;
 }
 
@@ -231,6 +238,12 @@ export interface QuestionData {
 export interface PowerUpHitData {
   type: PowerUpType;
   fromPlayerName: string;
+  hiddenAnswers?: number[]; // for 'fifty' - indices of hidden wrong answers
+}
+
+export interface PowerUpSelfData {
+  type: PowerUpType;
+  hiddenAnswers?: number[]; // for 'fifty' - indices of hidden wrong answers
 }
 
 export interface RevealData {

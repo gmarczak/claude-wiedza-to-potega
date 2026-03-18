@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { socket } from './socket';
+import { SFX } from './sounds';
 import type {
   RoomState, QuestionData, RevealData, GameResult, GameScreen, GameSettings,
-  CategoryVoteData, CategoryResultData, PowerUpPhaseData, PowerUpHitData, PowerUpType,
+  CategoryVoteData, CategoryResultData, PowerUpPhaseData, PowerUpHitData, PowerUpSelfData, PowerUpType,
   MiniGameData, MiniGameResultsData, PyramidIntroData, PyramidQuestionData, PyramidRevealData,
 } from './types';
 import HomeScreen from './components/HomeScreen';
@@ -29,11 +30,11 @@ function App() {
   const [playerId, setPlayerId] = useState('');
   const [hostComment, setHostComment] = useState<string | null>(null);
 
-  // New state for features
   const [categoryVote, setCategoryVote] = useState<CategoryVoteData | null>(null);
   const [categoryResult, setCategoryResult] = useState<CategoryResultData | null>(null);
   const [powerUpPhase, setPowerUpPhase] = useState<PowerUpPhaseData | null>(null);
   const [powerUpHit, setPowerUpHit] = useState<PowerUpHitData | null>(null);
+  const [powerUpSelf, setPowerUpSelf] = useState<PowerUpSelfData | null>(null);
   const [miniGameData, setMiniGameData] = useState<MiniGameData | null>(null);
   const [miniGameResults, setMiniGameResults] = useState<MiniGameResultsData | null>(null);
   const [pyramidIntro, setPyramidIntro] = useState<PyramidIntroData | null>(null);
@@ -44,9 +45,9 @@ function App() {
     setScreen('home'); setRoom(null); setCountdown(3); setQuestion(null);
     setTimeLeft(0); setReveal(null); setResult(null); setError(null);
     setHostComment(null); setCategoryVote(null); setCategoryResult(null);
-    setPowerUpPhase(null); setPowerUpHit(null); setMiniGameData(null);
-    setMiniGameResults(null); setPyramidIntro(null); setPyramidQuestion(null);
-    setPyramidReveal(null);
+    setPowerUpPhase(null); setPowerUpHit(null); setPowerUpSelf(null);
+    setMiniGameData(null); setMiniGameResults(null);
+    setPyramidIntro(null); setPyramidQuestion(null); setPyramidReveal(null);
     socket.disconnect();
   }, []);
 
@@ -55,6 +56,7 @@ function App() {
     socket.on('room:created', () => {});
     socket.on('room:joined', (roomState: RoomState) => { setRoom(roomState); setScreen('lobby'); setError(null); });
     socket.on('room:player-joined', (player) => {
+      SFX.select();
       setRoom((prev) => {
         if (!prev) return prev;
         if (prev.players.some((p) => p.id === player.id)) return prev;
@@ -64,22 +66,39 @@ function App() {
     socket.on('room:player-left', (leftId: string) => {
       setRoom((prev) => prev ? { ...prev, players: prev.players.filter((p) => p.id !== leftId) } : prev);
     });
-    socket.on('game:countdown', (s: number) => { setCountdown(s); setScreen('countdown'); });
+    socket.on('game:countdown', (s: number) => {
+      setCountdown(s); setScreen('countdown');
+      if (s > 0) SFX.countdown(); else SFX.countdownGo();
+    });
 
     socket.on('game:category-vote', (data: CategoryVoteData) => {
       setCategoryVote(data); setCategoryResult(null); setTimeLeft(data.timeLimit); setScreen('category_vote');
     });
     socket.on('game:category-result', (data: CategoryResultData) => {
       setCategoryResult(data); setScreen('category_result');
+      SFX.select();
     });
     socket.on('game:power-up-phase', (data: PowerUpPhaseData) => {
-      setPowerUpPhase(data); setPowerUpHit(null); setTimeLeft(data.timeLimit); setScreen('power_up');
+      setPowerUpPhase(data); setPowerUpHit(null); setPowerUpSelf(null);
+      setTimeLeft(data.timeLimit); setScreen('power_up');
     });
     socket.on('game:question', (data: QuestionData) => {
-      setQuestion(data); setTimeLeft(data.timeLimit); setPowerUpHit(null); setScreen('question');
+      setQuestion(data); setTimeLeft(data.timeLimit);
+      setPowerUpHit(null); setPowerUpSelf(null);
+      setScreen('question');
     });
-    socket.on('game:tick', (t: number) => setTimeLeft(t));
-    socket.on('game:power-up-hit', (data: PowerUpHitData) => setPowerUpHit(data));
+    socket.on('game:tick', (t: number) => {
+      setTimeLeft(t);
+      if (t <= 5 && t > 0) SFX.tickUrgent();
+    });
+    socket.on('game:power-up-hit', (data: PowerUpHitData) => {
+      setPowerUpHit(data);
+      SFX.powerUpHit();
+    });
+    socket.on('game:power-up-self', (data: PowerUpSelfData) => {
+      setPowerUpSelf(data);
+      SFX.powerUpSelf();
+    });
     socket.on('game:reveal', (data: RevealData) => {
       setReveal(data); setScreen('reveal');
       setRoom((prev) => {
@@ -96,6 +115,7 @@ function App() {
 
     socket.on('game:minigame-start', (data: MiniGameData) => {
       setMiniGameData(data); setMiniGameResults(null); setTimeLeft(data.timeLimit); setScreen('minigame');
+      SFX.gameStart();
     });
     socket.on('game:minigame-results', (data: MiniGameResultsData) => {
       setMiniGameResults(data); setScreen('minigame_results');
@@ -103,6 +123,7 @@ function App() {
 
     socket.on('game:pyramid-intro', (data: PyramidIntroData) => {
       setPyramidIntro(data); setScreen('pyramid_intro');
+      SFX.gameStart();
     });
     socket.on('game:pyramid-question', (data: PyramidQuestionData) => {
       setPyramidQuestion(data); setPyramidReveal(null); setTimeLeft(data.timeLimit); setScreen('pyramid_question');
@@ -111,7 +132,9 @@ function App() {
       setPyramidReveal(data); setScreen('pyramid_reveal');
     });
 
-    socket.on('game:finished', (data: GameResult) => { setResult(data); setScreen('finished'); });
+    socket.on('game:finished', (data: GameResult) => {
+      setResult(data); setScreen('finished');
+    });
     socket.on('game:host-comment', (c: string) => setHostComment(c));
     socket.on('error', (msg: string) => setError(msg));
 
@@ -119,11 +142,13 @@ function App() {
   }, []);
 
   const handleCreateRoom = (name: string, avatarId: string, settings: GameSettings) => {
+    SFX.click();
     socket.connect();
     socket.emit('room:create', { playerName: name, avatarId, settings });
   };
 
   const handleJoinRoom = (name: string, avatarId: string, roomId: string) => {
+    SFX.click();
     socket.connect();
     socket.emit('room:join', { roomId, playerName: name, avatarId });
   };
@@ -135,7 +160,7 @@ function App() {
       case 'home':
         return <HomeScreen onCreateRoom={handleCreateRoom} onJoinRoom={handleJoinRoom} error={error} />;
       case 'lobby':
-        return room ? <LobbyScreen room={room} playerId={playerId} onStartGame={() => socket.emit('game:start')} onLeave={resetGame} /> : null;
+        return room ? <LobbyScreen room={room} playerId={playerId} onStartGame={() => { SFX.gameStart(); socket.emit('game:start'); }} onLeave={resetGame} /> : null;
       case 'countdown':
         return <CountdownScreen count={countdown} />;
       case 'category_vote':
@@ -144,21 +169,22 @@ function App() {
           <CategoryVoteScreen
             voteData={categoryVote} resultData={screen === 'category_result' ? categoryResult : null}
             hasOverride={myPlayer?.hasOverride || false} timeLeft={timeLeft}
-            onVote={(cat) => socket.emit('game:category-vote', cat)}
-            onOverride={(cat) => socket.emit('game:use-override', cat)}
+            onVote={(cat) => { SFX.click(); socket.emit('game:category-vote', cat); }}
+            onOverride={(cat) => { SFX.select(); socket.emit('game:use-override', cat); }}
           />
         );
       case 'power_up':
         return powerUpPhase ? (
           <PowerUpScreen data={powerUpPhase} timeLeft={timeLeft}
-            onSelect={(pu: PowerUpType) => socket.emit('game:power-up-select', { powerUp: pu, targetId: powerUpPhase.opponentId })}
-            onSkip={() => socket.emit('game:power-up-skip')}
+            onSelect={(pu: PowerUpType, targetId: string) => { SFX.select(); socket.emit('game:power-up-select', { powerUp: pu, targetId }); }}
+            onSkip={() => { SFX.click(); socket.emit('game:power-up-skip'); }}
           />
         ) : null;
       case 'question':
         return question && room ? (
           <QuestionScreen question={question} timeLeft={timeLeft} room={room} playerId={playerId}
-            powerUpHit={powerUpHit} onAnswer={(i) => socket.emit('game:answer', i)}
+            powerUpHit={powerUpHit} powerUpSelf={powerUpSelf}
+            onAnswer={(i) => { SFX.select(); socket.emit('game:answer', i); }}
           />
         ) : null;
       case 'reveal':
@@ -176,7 +202,7 @@ function App() {
       case 'pyramid_question':
         return pyramidQuestion ? (
           <PyramidQuestion data={pyramidQuestion} timeLeft={timeLeft}
-            onAnswer={(i) => socket.emit('game:pyramid-answer', i)}
+            onAnswer={(i) => { SFX.select(); socket.emit('game:pyramid-answer', i); }}
           />
         ) : null;
       case 'pyramid_reveal':
@@ -191,7 +217,9 @@ function App() {
   return (
     <>
       <HostComment comment={hostComment} />
-      {renderScreen()}
+      <div className="screen-enter" key={screen}>
+        {renderScreen()}
+      </div>
     </>
   );
 }

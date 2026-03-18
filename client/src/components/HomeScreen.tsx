@@ -58,7 +58,7 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
             {/* Avatar selection */}
             <div className="bg-white/10 rounded-xl p-4 border border-white/20">
               <p className="text-purple-200 text-sm mb-3 font-medium">Wybierz postać</p>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto">
                 {AVATARS.map((avatar) => (
                   <button
                     key={avatar.id}

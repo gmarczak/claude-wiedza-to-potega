@@ -14,9 +14,13 @@ export const AVATARS: Avatar[] = [
   { id: 'ninja', name: 'Ninja', emoji: '🥷', color: '#6366f1' },
   { id: 'vampire', name: 'Wampir', emoji: '🧛', color: '#dc2626' },
   { id: 'astronaut', name: 'Astronauta', emoji: '👨‍🚀', color: '#0ea5e9' },
+  { id: 'dragon', name: 'Smok', emoji: '🐉', color: '#16a34a' },
+  { id: 'detective', name: 'Detektyw', emoji: '🕵️', color: '#78716c' },
+  { id: 'unicorn', name: 'Jednorożec', emoji: '🦄', color: '#e879f9' },
+  { id: 'ghost', name: 'Duch', emoji: '👻', color: '#94a3b8' },
 ];
 
-export type PowerUpType = 'slime' | 'platypus' | 'ice' | 'bomb';
+export type PowerUpType = 'slime' | 'platypus' | 'ice' | 'bomb' | 'double' | 'fifty';
 
 export interface PowerUp {
   type: PowerUpType;
@@ -55,8 +59,7 @@ export interface CategoryResultData {
 
 export interface PowerUpPhaseData {
   availablePowerUps: PowerUp[];
-  opponentId: string;
-  opponentName: string;
+  opponents: { id: string; name: string }[];
   timeLimit: number;
 }
 
@@ -76,6 +79,12 @@ export interface QuestionData {
 export interface PowerUpHitData {
   type: PowerUpType;
   fromPlayerName: string;
+  hiddenAnswers?: number[];
+}
+
+export interface PowerUpSelfData {
+  type: PowerUpType;
+  hiddenAnswers?: number[];
 }
 
 export interface RevealData {
