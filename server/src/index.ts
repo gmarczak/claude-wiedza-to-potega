@@ -12,10 +12,15 @@ import {
 } from './questions';
 
 const app = express();
-app.use(cors());
+
+const ALLOWED_ORIGINS = process.env.CLIENT_URL
+  ? [process.env.CLIENT_URL, 'http://localhost:5173']
+  : ['http://localhost:5173'];
+
+app.use(cors({ origin: ALLOWED_ORIGINS }));
 const httpServer = createServer(app);
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
-  cors: { origin: '*', methods: ['GET', 'POST'] },
+  cors: { origin: ALLOWED_ORIGINS, methods: ['GET', 'POST'] },
 });
 
 const rooms = new Map<string, Room>();

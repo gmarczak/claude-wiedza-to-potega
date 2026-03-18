@@ -72,7 +72,7 @@ Zwycięzca otrzymuje Legendarny Zwój Wiedzy z ciekawostką!
 - **Backend**: Node.js + Express + Socket.io
 - **Pytania**: Wbudowane pytania PL + Open Trivia DB API
 
-## Uruchomienie
+## Uruchomienie lokalne
 
 ```bash
 # Zainstaluj zależności
@@ -84,6 +84,35 @@ npm run dev
 
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3001
+
+## Deployment (Vercel + Railway)
+
+### Backend — Railway
+
+1. Zaloguj się na [railway.app](https://railway.app)
+2. **New Project → Deploy from GitHub Repo** — wybierz to repo
+3. W ustawieniach serwisu:
+   - **Root Directory**: `server`
+   - Railway automatycznie wykryje `railway.json` i zbuduje serwer
+4. Dodaj zmienną środowiskową:
+   - `CLIENT_URL` = URL twojej aplikacji na Vercel (np. `https://twoja-app.vercel.app`)
+5. Skopiuj URL serwisu Railway (np. `https://twoja-app-production.up.railway.app`)
+
+### Frontend — Vercel
+
+1. Zaloguj się na [vercel.com](https://vercel.com)
+2. **Add New Project → Import** — wybierz to repo
+3. W ustawieniach:
+   - **Root Directory**: `client`
+   - **Framework Preset**: Vite
+4. Dodaj zmienną środowiskową:
+   - `VITE_SERVER_URL` = URL twojego serwisu Railway (np. `https://twoja-app-production.up.railway.app`)
+5. Deploy!
+
+### Kolejność
+1. Najpierw deploy **Railway** (backend) — żeby mieć URL serwera
+2. Potem deploy **Vercel** (frontend) — z ustawionym `VITE_SERVER_URL`
+3. Wróć do Railway i ustaw `CLIENT_URL` na URL z Vercel
 
 ## Jak grać
 
