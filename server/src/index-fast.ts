@@ -6,7 +6,7 @@ const origSetTimeout = global.setTimeout;
 const origSetInterval = global.setInterval;
 
 // Speed multiplier: 10x faster
-const SPEED = 10;
+const SPEED = 3;
 
 global.setTimeout = ((fn: any, delay: any, ...args: any[]) => {
   return origSetTimeout(fn, Math.max(50, (delay || 0) / SPEED), ...args);
