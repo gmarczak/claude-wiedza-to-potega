@@ -1,24 +1,24 @@
-# Wiedza to Potęga - 1 na 1
+# Wiedza to Potęga
 
-Quiz online dla dwóch graczy inspirowany teleturniejem "Wiedza to Potęga" (PS4 PlayLink).
+Quiz online dla 2-6 graczy inspirowany teleturniejem "Wiedza to Potęga" (PS4 PlayLink). Graj ze znajomymi w czasie rzeczywistym — twórz pokój, udostępnij kod i rywalizujcie o miano mistrza wiedzy!
 
 ## Screenshoty
 
 ### Ekran główny
 ![Ekran główny](docs/screenshots/01-home.png)
-Wybierz awatara, wpisz imię i stwórz lub dołącz do pokoju.
+Wybierz jednego z 12 awatarów, wpisz imię i stwórz pokój lub dołącz do istniejącego.
 
 ### Poczekalnia
 ![Poczekalnia](docs/screenshots/02-lobby.png)
-Poczekaj na drugiego gracza i rozpocznij grę.
+Poczekaj na graczy (2-6 osób) i rozpocznij grę jako host.
 
 ### Głosowanie na kategorię
 ![Głosowanie na kategorię](docs/screenshots/03-category-vote.png)
-Wybierzcie kategorię pytań — lub użyj przełamania, by wymusić swoją kategorię!
+Wszyscy gracze głosują na kategorię pytań — lub użyj przełamania, by wymusić swoją kategorię!
 
 ### Wybór mocy
 ![Wybór mocy](docs/screenshots/04-power-up.png)
-Przed każdą rundą wybierz moc, która utrudni grę przeciwnikowi.
+Przed każdą rundą wybierz moc (zagrywkę), która utrudni grę przeciwnikom.
 
 ### Pytanie
 ![Pytanie](docs/screenshots/05-question.png)
@@ -56,15 +56,17 @@ Zwycięzca otrzymuje Legendarny Zwój Wiedzy z ciekawostką!
 
 ## Funkcje
 
+- **2-6 graczy** w czasie rzeczywistym przez Socket.io
 - Głosowanie na kategorię pytań (z opcją przełamania)
-- 4 moce: Glut, Dziobak, Lód, Bomba
+- 4 zagrywki (power-upy): Szlam, Dziobak, Lód, Bomba
 - Punkty za szybkość odpowiedzi (do +10 bonus)
 - Mini-gry między rundami (łączenie par, sortowanie)
 - Piramida Wiedzy — wielki finał
-- 8 unikalnych awatarów
+- 12 unikalnych awatarów
 - Komentarze prowadzącego "Maks"
 - Pytania z obrazkami
 - Wbudowane pytania PL + Open Trivia DB API
+- Format gry: 3x pytania + minigra + 3x pytania + minigra + 3x pytania + Piramida Wiedzy
 
 ## Technologie
 
@@ -118,9 +120,9 @@ npm run dev
 
 1. Wejdź na stronę, wybierz awatara i podaj swoje imię
 2. **Stwórz Pokój** — otrzymasz 6-znakowy kod
-3. Podaj kod drugiej osobie — ta osoba wybiera **Dołącz do Pokoju**
-4. Host rozpoczyna grę gdy obaj gracze są w pokoju
-5. Głosujecie na kategorię → wybieracie moce → odpowiadacie na pytania
+3. Podaj kod znajomym — wybierają **Dołącz do Pokoju** i wpisują kod
+4. Host rozpoczyna grę gdy co najmniej 2 graczy jest w pokoju (max 6)
+5. Głosujecie na kategorię → wybieracie zagrywki → odpowiadacie na pytania
 6. Co 3 pytania — mini-gra!
 7. Na koniec — Piramida Wiedzy: wielki finał o zwycięstwo
 8. Zwycięzca otrzymuje Legendarny Zwój Wiedzy!
