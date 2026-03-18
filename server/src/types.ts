@@ -131,6 +131,8 @@ export interface Room {
   pyramidSize: number;
   // Host comments
   hostComment: string | null;
+  // Settings
+  difficulty: string;
 }
 
 export interface GameSettings {

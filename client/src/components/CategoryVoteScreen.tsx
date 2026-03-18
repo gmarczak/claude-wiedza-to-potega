@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { CategoryVoteData, CategoryResultData } from '../types';
 
 interface Props {
@@ -13,6 +13,12 @@ interface Props {
 export default function CategoryVoteScreen({ voteData, resultData, hasOverride, timeLeft, onVote, onOverride }: Props) {
   const [voted, setVoted] = useState(false);
   const [showOverride, setShowOverride] = useState(false);
+
+  // Reset state when new vote data arrives
+  useEffect(() => {
+    setVoted(false);
+    setShowOverride(false);
+  }, [voteData]);
 
   if (resultData) {
     return (

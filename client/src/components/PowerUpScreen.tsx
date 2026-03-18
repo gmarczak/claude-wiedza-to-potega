@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { PowerUpPhaseData, PowerUpType } from '../types';
 
 interface Props {
@@ -10,6 +10,11 @@ interface Props {
 
 export default function PowerUpScreen({ data, timeLeft, onSelect, onSkip }: Props) {
   const [selected, setSelected] = useState(false);
+
+  // Reset state when new power-up phase arrives
+  useEffect(() => {
+    setSelected(false);
+  }, [data]);
 
   const handleSelect = (type: PowerUpType) => {
     if (selected) return;

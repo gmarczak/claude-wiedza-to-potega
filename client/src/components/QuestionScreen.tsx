@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { QuestionData, RoomState, PowerUpHitData } from '../types';
 
 interface Props {
@@ -23,13 +23,16 @@ const difficultyLabels: Record<string, { text: string; color: string }> = {
   hard: { text: 'Trudne', color: 'bg-red-500/20 text-red-300' },
 };
 
-// Power-up effects
-function applyPlatypus(text: string): string {
+// Power-up effects - deterministic version using question as seed
+function applyPlatypus(text: string, seed: number): string {
   const chars = text.split('');
   const removeCount = Math.floor(chars.length * 0.4);
   const indices = chars.map((_, i) => i).filter((i) => chars[i] !== ' ');
+  // Simple seeded pseudo-random
+  let s = seed;
+  const seededRandom = () => { s = (s * 16807 + 0) % 2147483647; return s / 2147483647; };
   for (let i = 0; i < removeCount && indices.length > 0; i++) {
-    const idx = Math.floor(Math.random() * indices.length);
+    const idx = Math.floor(seededRandom() * indices.length);
     chars[indices[idx]] = '_';
     indices.splice(idx, 1);
   }
@@ -43,6 +46,16 @@ export default function QuestionScreen({ question, timeLeft, room, playerId, pow
   const [frozen, setFrozen] = useState(false);
   const [shuffledOrder, setShuffledOrder] = useState<number[]>([0, 1, 2, 3]);
   const [bombTriggered, setBombTriggered] = useState(false);
+
+  // Reset all state when question changes
+  useEffect(() => {
+    setSelectedAnswer(null);
+    setSlimeCleared(false);
+    setSlimeClicks(0);
+    setFrozen(false);
+    setShuffledOrder([0, 1, 2, 3]);
+    setBombTriggered(false);
+  }, [question.questionNumber]);
 
   // Apply power-up effects
   useEffect(() => {
@@ -66,6 +79,13 @@ export default function QuestionScreen({ question, timeLeft, room, playerId, pow
     }
   }, [powerUpHit]);
 
+  // Memoize platypus text so it doesn't change on every render
+  const platypusTexts = useMemo(() => {
+    if (powerUpHit?.type !== 'platypus') return null;
+    const seed = question.questionNumber * 1000;
+    return question.answers.map((a, i) => applyPlatypus(a, seed + i));
+  }, [question.questionNumber, question.answers, powerUpHit]);
+
   const handleAnswer = useCallback((index: number) => {
     if (selectedAnswer !== null || frozen) return;
     setSelectedAnswer(index);
@@ -88,7 +108,6 @@ export default function QuestionScreen({ question, timeLeft, room, playerId, pow
   const opponent = room.players.find((p) => p.id !== playerId);
 
   const hasSlime = powerUpHit?.type === 'slime' && !slimeCleared;
-  const hasPlatypus = powerUpHit?.type === 'platypus';
   const displayOrder = bombTriggered ? shuffledOrder : [0, 1, 2, 3];
 
   return (
@@ -169,7 +188,7 @@ export default function QuestionScreen({ question, timeLeft, room, playerId, pow
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {displayOrder.map((origIndex) => {
             const answer = question.answers[origIndex];
-            const displayText = hasPlatypus ? applyPlatypus(answer) : answer;
+            const displayText = platypusTexts ? platypusTexts[origIndex] : answer;
             return (
               <button key={origIndex} onClick={() => handleAnswer(origIndex)} disabled={selectedAnswer !== null || frozen}
                 className={`relative p-4 rounded-xl font-semibold text-white text-left transition-all ${

@@ -98,7 +98,7 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
               <div>
                 <label className="block text-purple-200 text-sm mb-1">Czas na odpowiedź</label>
                 <select value={settings.roundTime} onChange={(e) => setSettings({ ...settings, roundTime: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-400">
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-400 [&>option]:bg-gray-800 [&>option]:text-white">
                   <option value={10}>10 sekund</option>
                   <option value={15}>15 sekund</option>
                   <option value={20}>20 sekund</option>
@@ -108,7 +108,7 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
               <div>
                 <label className="block text-purple-200 text-sm mb-1">Trudność</label>
                 <select value={settings.difficulty} onChange={(e) => setSettings({ ...settings, difficulty: e.target.value })}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-400">
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-400 [&>option]:bg-gray-800 [&>option]:text-white">
                   <option value="mixed">Mieszana</option>
                   <option value="easy">Łatwa</option>
                   <option value="medium">Średnia</option>

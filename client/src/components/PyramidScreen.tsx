@@ -153,6 +153,9 @@ export function PyramidReveal({ data }: { data: PyramidRevealData }) {
                   ))}
                 </div>
                 <div className="text-yellow-400 text-xs mt-1">Poziom {p.newPosition}/{data.pyramidSize}</div>
+                {p.newPosition >= data.pyramidSize && (
+                  <div className="text-yellow-300 font-bold text-sm mt-1 animate-countdown">SZCZYT!</div>
+                )}
               </div>
             );
           })}

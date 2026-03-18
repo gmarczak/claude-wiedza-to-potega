@@ -92,7 +92,7 @@ const PYRAMID_QUESTIONS = 5;
 
 async function startGame(room: Room) {
   // Prepare questions: 9 for rounds + 5 for pyramid
-  const allQuestions = await getQuestions(QUESTIONS_PER_GROUP * TOTAL_GROUPS + PYRAMID_QUESTIONS);
+  const allQuestions = await getQuestions(QUESTIONS_PER_GROUP * TOTAL_GROUPS + PYRAMID_QUESTIONS, room.difficulty);
   room.questions = allQuestions.slice(0, QUESTIONS_PER_GROUP * TOTAL_GROUPS);
   room.pyramidQuestions = allQuestions.slice(QUESTIONS_PER_GROUP * TOTAL_GROUPS);
   room.totalRounds = room.questions.length;
@@ -551,6 +551,7 @@ io.on('connection', (socket) => {
       currentPowerUps: {}, roundGroup: 0, roundInGroup: 0,
       miniGames: [], currentMiniGame: 0, pyramidQuestions: [],
       pyramidQuestionIndex: 0, pyramidSize: 5, hostComment: null,
+      difficulty: settings.difficulty || 'mixed',
     };
 
     rooms.set(roomId, room);
