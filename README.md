@@ -24,20 +24,6 @@ Przed każdą rundą wybierz moc (zagrywkę), która utrudni grę przeciwnikom.
 ![Pytanie](docs/screenshots/05-question.png)
 Odpowiadaj szybko — im szybciej, tym więcej punktów bonus!
 
-### Przeszkadzajki (Power-upy)
-
-**Szlam** — zielona maź zakrywa odpowiedzi, klikaj aby wytrzeć!
-![Szlam](docs/screenshots/05a-slime.png)
-
-**Lód** — ekran zamraża się na 3 sekundy, nie możesz odpowiadać!
-![Lód](docs/screenshots/05b-ice.png)
-
-**Dziobak** — usuwa 40% liter z odpowiedzi, musisz zgadywać!
-![Dziobak](docs/screenshots/05c-platypus.png)
-
-**Bomba** — po 3 sekundach odpowiedzi się losowo mieszają!
-![Bomba](docs/screenshots/05d-bomb.png)
-
 ### Ujawnienie odpowiedzi
 ![Ujawnienie odpowiedzi](docs/screenshots/06-reveal.png)
 Po każdym pytaniu zobaczysz, kto odpowiedział poprawnie i ile punktów zdobył.
