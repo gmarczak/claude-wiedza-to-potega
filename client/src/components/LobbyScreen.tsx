@@ -10,7 +10,7 @@ interface Props {
 
 export default function LobbyScreen({ room, playerId, onStartGame, onLeave }: Props) {
   const isHost = room.players.length > 0 && room.players[0].id === playerId;
-  const canStart = room.players.length === 2;
+  const canStart = room.players.length >= 2;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
@@ -21,16 +21,16 @@ export default function LobbyScreen({ room, playerId, onStartGame, onLeave }: Pr
             <span className="text-purple-200 text-sm">Kod pokoju:</span>
             <span className="text-2xl font-mono font-bold text-white tracking-widest">{room.id}</span>
           </div>
-          <p className="text-purple-300 text-sm mt-2">Podaj ten kod drugiej osobie</p>
+          <p className="text-purple-300 text-sm mt-2">Podaj ten kod innym graczom</p>
         </div>
 
         <div className="bg-white/10 rounded-xl p-6 mb-6 border border-white/20">
-          <h3 className="text-white font-semibold mb-4">Gracze ({room.players.length}/2)</h3>
-          <div className="space-y-3">
+          <h3 className="text-white font-semibold mb-4">Gracze ({room.players.length}/6)</h3>
+          <div className="space-y-3 stagger-children">
             {room.players.map((player, index) => {
               const avatar = AVATARS.find((a) => a.id === player.avatarId) || AVATARS[0];
               return (
-                <div key={player.id} className="flex items-center gap-3 p-3 bg-white/10 rounded-lg">
+                <div key={player.id} className="flex items-center gap-3 p-3 bg-white/10 rounded-lg animate-scale-in">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
                     style={{ backgroundColor: avatar.color + '33', border: `2px solid ${avatar.color}` }}>
                     {avatar.emoji}
@@ -45,20 +45,23 @@ export default function LobbyScreen({ room, playerId, onStartGame, onLeave }: Pr
                 </div>
               );
             })}
-            {room.players.length < 2 && (
-              <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border-2 border-dashed border-white/20">
+            {Array.from({ length: Math.max(0, 2 - room.players.length) }).map((_, i) => (
+              <div key={`empty-${i}`} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border-2 border-dashed border-white/20">
                 <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
                   <span className="text-white/30 text-xl">?</span>
                 </div>
-                <span className="text-white/40">Oczekiwanie na przeciwnika...</span>
+                <span className="text-white/40">Oczekiwanie na gracza...</span>
               </div>
-            )}
+            ))}
           </div>
         </div>
 
         <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/10">
           <p className="text-purple-300 text-xs text-center">
             Format gry: 3x pytania + minigra + 3x pytania + minigra + 3x pytania + Piramida Wiedzy
+          </p>
+          <p className="text-purple-400 text-xs text-center mt-1">
+            2-6 graczy | Wybiór kategorii | Zagrywki | Mini-gry
           </p>
         </div>
 
@@ -67,10 +70,10 @@ export default function LobbyScreen({ room, playerId, onStartGame, onLeave }: Pr
             className={`w-full py-4 font-bold text-lg rounded-xl transition-all shadow-lg ${
               canStart ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white animate-pulse-glow' : 'bg-white/10 text-white/40 cursor-not-allowed'
             }`}>
-            {canStart ? 'Rozpocznij Grę!' : 'Czekam na drugiego gracza...'}
+            {canStart ? `Rozpocznij Grę! (${room.players.length} graczy)` : 'Czekam na drugiego gracza...'}
           </button>
         ) : (
-          <div className="text-center py-4 text-purple-300">Oczekiwanie na rozpoczęcie gry przez hosta...</div>
+          <div className="text-center py-4 text-purple-300 animate-float">Oczekiwanie na rozpoczęcie gry przez hosta...</div>
         )}
 
         <button onClick={onLeave} className="w-full mt-4 py-3 text-purple-300 hover:text-white transition-colors">

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: wiedza-to-potega-server
+    runtime: node
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_URL
+        sync: false

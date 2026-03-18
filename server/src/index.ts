@@ -92,7 +92,7 @@ const PYRAMID_QUESTIONS = 5;
 
 async function startGame(room: Room) {
   // Prepare questions: 9 for rounds + 5 for pyramid
-  const allQuestions = await getQuestions(QUESTIONS_PER_GROUP * TOTAL_GROUPS + PYRAMID_QUESTIONS);
+  const allQuestions = await getQuestions(QUESTIONS_PER_GROUP * TOTAL_GROUPS + PYRAMID_QUESTIONS, room.difficulty);
   room.questions = allQuestions.slice(0, QUESTIONS_PER_GROUP * TOTAL_GROUPS);
   room.pyramidQuestions = allQuestions.slice(QUESTIONS_PER_GROUP * TOTAL_GROUPS);
   room.totalRounds = room.questions.length;
@@ -192,15 +192,15 @@ function startPowerUpPhase(room: Room) {
   room.currentPowerUps = {};
 
   room.players.forEach((p) => {
-    const opponent = room.players.find((o) => o.id !== p.id);
-    if (opponent) {
-      io.to(p.id).emit('game:power-up-phase', {
-        availablePowerUps: POWER_UPS,
-        opponentId: opponent.id,
-        opponentName: opponent.name,
-        timeLimit: 8,
-      });
-    }
+    const opponents = room.players
+      .filter((o) => o.id !== p.id)
+      .map((o) => ({ id: o.id, name: o.name }));
+
+    io.to(p.id).emit('game:power-up-phase', {
+      availablePowerUps: POWER_UPS,
+      opponents,
+      timeLimit: 8,
+    });
   });
 
   let timeLeft = 8;
@@ -247,20 +247,42 @@ function startQuestion(room: Room) {
 
   // Send power-up effects after 1 second
   setTimeout(() => {
-    room.players.forEach((p) => {
-      const attackerEntry = Object.entries(room.currentPowerUps).find(
-        ([attackerId, _]) => attackerId !== p.id
-      );
-      if (attackerEntry) {
-        const [attackerId, powerUp] = attackerEntry;
-        if (powerUp) {
-          const attacker = room.players.find((pl) => pl.id === attackerId);
-          io.to(p.id).emit('game:power-up-hit', {
-            type: powerUp,
-            fromPlayerName: attacker?.name || '?',
-          });
-          sendHostComment(room, 'powerUpUsed');
+    const question = room.questions[room.currentQuestionIndex - 1] || room.questions[room.currentQuestionIndex];
+    const currentQ = room.questions[room.currentQuestionIndex];
+
+    // Handle self-buffs (double, fifty)
+    room.players.forEach((player) => {
+      const entry = room.currentPowerUps[player.id];
+      if (!entry) return;
+      const isSelfBuff = entry.type === 'double' || entry.type === 'fifty';
+      if (isSelfBuff) {
+        if (entry.type === 'fifty') {
+          // Pick 2 wrong answers to hide
+          const wrongIndices = currentQ.answers.map((_, i) => i).filter(i => i !== currentQ.correctIndex);
+          const shuffledWrong = wrongIndices.sort(() => Math.random() - 0.5);
+          const hidden = shuffledWrong.slice(0, 2);
+          io.to(player.id).emit('game:power-up-self', { type: 'fifty', hiddenAnswers: hidden });
+        } else {
+          io.to(player.id).emit('game:power-up-self', { type: 'double' });
         }
+        sendHostComment(room, 'powerUpUsed');
+      }
+    });
+
+    // Handle attacks on opponents
+    room.players.forEach((target) => {
+      const attacks = Object.entries(room.currentPowerUps)
+        .filter(([attackerId, data]) => data && data.targetId === target.id && data.type !== 'double' && data.type !== 'fifty')
+        .map(([attackerId, data]) => ({ attackerId, type: data!.type }));
+
+      if (attacks.length > 0) {
+        const attack = attacks[0];
+        const attacker = room.players.find((pl) => pl.id === attack.attackerId);
+        io.to(target.id).emit('game:power-up-hit', {
+          type: attack.type,
+          fromPlayerName: attacker?.name || '?',
+        });
+        sendHostComment(room, 'powerUpUsed');
       }
     });
   }, 1000);
@@ -300,6 +322,11 @@ function revealAnswer(room: Room) {
       const bonus = getSpeedBonus(answerTime, room.roundTime);
       if (bonus > 0) speedBonusGiven = true;
       pointsEarned += bonus;
+      // Double points power-up
+      const selfPowerUp = room.currentPowerUps[p.id];
+      if (selfPowerUp && selfPowerUp.type === 'double') {
+        pointsEarned *= 2;
+      }
       p.score += pointsEarned;
     }
 
@@ -312,8 +339,8 @@ function revealAnswer(room: Room) {
 
   // Host comment based on results
   const correctCount = playerResults.filter((p) => p.answer === question.correctIndex).length;
-  if (correctCount === 2) sendHostComment(room, 'correctBoth');
-  else if (correctCount === 1) sendHostComment(room, 'correctOne');
+  if (correctCount === room.players.length) sendHostComment(room, 'correctBoth');
+  else if (correctCount >= 1) sendHostComment(room, 'correctOne');
   else sendHostComment(room, 'bothWrong');
 
   io.to(room.id).emit('game:reveal', {
@@ -410,18 +437,23 @@ function startPyramidIntro(room: Room) {
 
   sendHostComment(room, 'pyramidStart');
 
-  // Starting position based on score difference
+  // Starting positions based on score - proportional head starts
   const sorted = [...room.players].sort((a, b) => b.score - a.score);
-  if (sorted.length === 2) {
-    const scoreDiff = sorted[0].score - sorted[1].score;
-    const headStart = Math.min(2, Math.floor(scoreDiff / 30)); // max 2 step advantage
-    sorted[0].pyramidPosition = headStart;
-    sorted[1].pyramidPosition = 0;
-  }
+  const topScore = sorted[0].score;
+  const bottomScore = sorted[sorted.length - 1].score;
+  const scoreRange = topScore - bottomScore;
+
+  sorted.forEach((p, index) => {
+    if (scoreRange > 0) {
+      const ratio = (p.score - bottomScore) / scoreRange;
+      p.pyramidPosition = Math.round(ratio * 2); // top player: up to 2 steps
+    } else {
+      p.pyramidPosition = 0; // all tied
+    }
+  });
 
   // Check close game
-  const scores = room.players.map((p) => p.score);
-  if (scores.length === 2 && Math.abs(scores[0] - scores[1]) <= 20) {
+  if (scoreRange <= 20) {
     sendHostComment(room, 'closeGame');
   }
 
@@ -516,7 +548,7 @@ function endGame(room: Room) {
   });
 
   const sorted = [...room.players].sort((a, b) => b.score - a.score);
-  const isTie = sorted.length === 2 && sorted[0].score === sorted[1].score;
+  const isTie = sorted.length >= 2 && sorted[0].score === sorted[1].score;
   const winner = isTie ? null : sorted.length > 0 ? { id: sorted[0].id, name: sorted[0].name } : null;
 
   // Also check pyramid winner
@@ -551,6 +583,7 @@ io.on('connection', (socket) => {
       currentPowerUps: {}, roundGroup: 0, roundInGroup: 0,
       miniGames: [], currentMiniGame: 0, pyramidQuestions: [],
       pyramidQuestionIndex: 0, pyramidSize: 5, hostComment: null,
+      difficulty: settings.difficulty || 'mixed',
     };
 
     rooms.set(roomId, room);
@@ -562,7 +595,7 @@ io.on('connection', (socket) => {
   socket.on('room:join', ({ roomId, playerName, avatarId }) => {
     const room = rooms.get(roomId.toUpperCase());
     if (!room) { socket.emit('error', 'Pokój nie istnieje'); return; }
-    if (room.players.length >= 2) { socket.emit('error', 'Pokój jest pełny'); return; }
+    if (room.players.length >= 6) { socket.emit('error', 'Pokój jest pełny'); return; }
     if (room.phase !== 'waiting') { socket.emit('error', 'Gra już trwa'); return; }
 
     const player: Player = {
@@ -606,7 +639,7 @@ io.on('connection', (socket) => {
     const room = findRoom(socket.id);
     if (!room || room.phase !== 'power_up') return;
     if (room.currentPowerUps[socket.id] !== undefined) return;
-    room.currentPowerUps[socket.id] = powerUp;
+    room.currentPowerUps[socket.id] = { type: powerUp, targetId };
     if (checkAllPowerUpsSelected(room)) { clearTimer(room); startQuestion(room); }
   });
 
