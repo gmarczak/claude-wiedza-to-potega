@@ -37,7 +37,7 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
           <h1 className="text-5xl font-black text-white text-shadow mb-2">Wiedza</h1>
           <p className="text-2xl font-bold text-purple-300">to Potęga</p>
           <div className="mt-2 inline-block px-4 py-1 bg-white/10 rounded-full">
-            <span className="text-sm font-semibold text-purple-200">1 na 1</span>
+            <span className="text-sm font-semibold text-purple-200">2-6 graczy</span>
           </div>
         </div>
 

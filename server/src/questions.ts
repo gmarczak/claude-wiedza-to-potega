@@ -417,22 +417,22 @@ export const hostComments = {
   gameStart: [
     'Witajcie w Wiedza to Potęga! Czas sprawdzić, kto wie więcej!',
     'Zaczynamy! Niech wygra mądrzejszy!',
-    'Wiedza to Potęga - 1 na 1! Gotowi na pojedynek umysłów?',
+    'Wiedza to Potęga! Gotowi na pojedynek umysłów?',
     'Uwaga, uwaga! Turniej wiedzy czas zacząć!',
     'Kto pierwszy, ten lepszy! A kto mądrzejszy, ten wygrywa!',
   ],
   correctBoth: [
-    'Obaj wiedzą! Ale kto był szybszy?',
+    'Wielu wie! Ale kto był szybszy?',
     'Brawo! Wiedza na wysokim poziomie!',
-    'Dwie poprawne odpowiedzi! Liczy się szybkość!',
+    'Poprawne odpowiedzi! Liczy się szybkość!',
     'Ekspresowe odpowiedzi! Imponujące!',
-    'Obaj gracze w formie! To się robi ciekawe!',
+    'Gracze w formie! To się robi ciekawe!',
   ],
   correctOne: [
     'Tylko jeden zdobywa punkty! Trzeba nadrabiać!',
     'Jest różnica! Jeden prowadzi!',
     'Wiedza to potęga... ale nie dla wszystkich!',
-    'Punkt dla jednego! Drugi musi się sprężyć!',
+    'Punkt dla jednego! Reszta musi się sprężyć!',
     'Oj, ktoś musi powtórzyć lekcje!',
   ],
   bothWrong: [
@@ -440,7 +440,7 @@ export const hostComments = {
     'Hmm, żadna poprawna odpowiedź. Trudna kategoria!',
     'Pusto! Może następne pytanie będzie łatwiejsze.',
     'Oho, zawieje! Nikt nie wiedział!',
-    'To pytanie pokonało obu graczy!',
+    'To pytanie pokonało wszystkich graczy!',
   ],
   powerUpUsed: [
     'Zagrywka w akcji! To powinno utrudnić sprawę!',
