@@ -10,6 +10,7 @@ import {
   getQuestions, getAvailableCategories, getMiniGames,
   shuffleArray, getHostComment, getRandomFunFact,
 } from './questions';
+import { generateRoomId, getBasePoints, getSpeedBonus } from './utils';
 
 const app = express();
 
@@ -25,12 +26,6 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
 
 const rooms = new Map<string, Room>();
 
-function generateRoomId(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let result = '';
-  for (let i = 0; i < 6; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
-  return result;
-}
 
 function getPlayerInfo(p: Player): PlayerInfo {
   return { id: p.id, name: p.name, avatarId: p.avatarId, score: p.score, hasOverride: p.hasOverride && !p.usedOverride };
@@ -64,23 +59,6 @@ function sendHostComment(room: Room, key: Parameters<typeof getHostComment>[0]) 
   const comment = getHostComment(key);
   room.hostComment = comment;
   io.to(room.id).emit('game:host-comment', comment);
-}
-
-// ===== SPEED SCORING =====
-function getSpeedBonus(answerTime: number | null, roundTime: number): number {
-  if (answerTime === null) return 0;
-  const timeSpent = answerTime;
-  const ratio = Math.max(0, 1 - timeSpent / (roundTime * 1000));
-  return Math.round(ratio * 10); // up to 10 bonus points
-}
-
-function getBasePoints(difficulty: string): number {
-  switch (difficulty) {
-    case 'easy': return 10;
-    case 'medium': return 20;
-    case 'hard': return 30;
-    default: return 10;
-  }
 }
 
 // ===== GAME FLOW =====
