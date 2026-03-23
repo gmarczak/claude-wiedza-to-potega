@@ -58,58 +58,84 @@ export default function PowerUpScreen({ data, timeLeft, onSelect, onSkip }: Prop
       : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md animate-slide-up">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-white mb-2">Zagrywka!</h2>
-          <p className="text-purple-300 text-sm">
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Scanline overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-scanlines opacity-[0.04] z-10" />
+      {/* Ambient magenta glow — powerup vibe */}
+      <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-64 bg-[#FF2D78] opacity-[0.04] blur-3xl" />
+
+      <div className="w-full max-w-md animate-slide-up relative z-20">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h2 className="font-orbitron text-3xl font-black uppercase tracking-widest text-[#FF2D78] glow-text-danger mb-2">
+            Zagrywka!
+          </h2>
+          <p className="text-white/40 text-xs uppercase tracking-widest">
             {chosenPowerUp && data.opponents.length > 1 && !chosenTarget
               ? 'Wybierz cel zagrywki'
               : selectedOpponentName
-                ? <>Utrudnij odpowiedź dla <span className="text-white font-semibold">{selectedOpponentName}</span></>
+                ? <>Utrudnij odpowiedź dla <span className="text-[#FF2D78]">{selectedOpponentName}</span></>
                 : 'Wybierz zagrywkę'}
           </p>
-          <div className={`text-lg font-mono font-bold mt-2 ${timeLeft <= 3 ? 'text-red-400' : 'text-white'}`}>
+          <div className={`font-orbitron text-2xl font-bold mt-3 tracking-widest transition-colors duration-300 ${
+            timeLeft <= 3 ? 'text-[#FF2D78] glow-text-danger animate-timer-urgent' : 'text-[#00F5FF] glow-text-cyan'
+          }`}>
             {timeLeft}s
           </div>
         </div>
 
-        {/* Show target selection if power-up chosen and multiple opponents */}
+        {/* Target selection */}
         {chosenPowerUp && data.opponents.length > 1 && !chosenTarget ? (
-          <div className="space-y-3 mb-4">
+          <div className="space-y-3 mb-5">
             {data.opponents.map((opp) => (
-              <button key={opp.id} onClick={() => handleSelectTarget(opp.id)} disabled={selected}
-                className={`w-full p-4 rounded-xl flex items-center gap-4 transition-all ${
-                  selected ? 'opacity-50 bg-white/10' : 'bg-white/10 hover:bg-white/20 border border-white/20 hover:border-purple-400'
-                }`}>
+              <button
+                key={opp.id}
+                onClick={() => handleSelectTarget(opp.id)}
+                disabled={selected}
+                className={`w-full p-4 flex items-center gap-4 transition-all duration-200 ${
+                  selected
+                    ? 'opacity-30 border border-white/10 cursor-not-allowed'
+                    : 'border border-[#FF2D78]/40 bg-[#12121a] hover:border-[#FF2D78] hover:bg-[#FF2D78]/5 hover:shadow-[0_0_12px_rgba(255,45,120,0.3)]'
+                }`}
+              >
                 <span className="text-2xl">🎯</span>
                 <div className="text-left">
-                  <div className="text-white font-semibold">{opp.name}</div>
+                  <div className="text-white font-semibold tracking-wide">{opp.name}</div>
                 </div>
               </button>
             ))}
           </div>
         ) : (
-          <div className="space-y-3 mb-4">
+          /* Power-up selection */
+          <div className="space-y-3 mb-5">
             {data.availablePowerUps.map((pu) => (
-              <button key={pu.type} onClick={() => handleSelectPowerUp(pu.type)} disabled={selected}
-                className={`w-full p-4 rounded-xl flex items-center gap-4 transition-all ${
-                  selected ? 'opacity-50 bg-white/10'
-                    : chosenPowerUp === pu.type ? 'bg-purple-500/30 border border-purple-400'
-                    : 'bg-white/10 hover:bg-white/20 border border-white/20 hover:border-purple-400'
-                }`}>
+              <button
+                key={pu.type}
+                onClick={() => handleSelectPowerUp(pu.type)}
+                disabled={selected}
+                className={`w-full p-4 flex items-center gap-4 transition-all duration-200 ${
+                  selected
+                    ? 'opacity-30 border border-white/10 cursor-not-allowed'
+                    : chosenPowerUp === pu.type
+                    ? 'border-2 border-[#FF2D78] bg-[#FF2D78]/10 shadow-[0_0_16px_rgba(255,45,120,0.4)]'
+                    : 'border border-[#FF2D78]/30 bg-[#12121a] hover:border-[#FF2D78]/70 hover:bg-[#FF2D78]/5 hover:shadow-[0_0_10px_rgba(255,45,120,0.2)]'
+                }`}
+              >
                 <span className="text-3xl">{pu.emoji}</span>
                 <div className="text-left">
-                  <div className="text-white font-semibold">{pu.name}</div>
-                  <div className="text-purple-300 text-xs">{pu.description}</div>
+                  <div className="text-white font-semibold tracking-wide">{pu.name}</div>
+                  <div className="text-[#FF2D78]/60 text-xs mt-0.5">{pu.description}</div>
                 </div>
               </button>
             ))}
           </div>
         )}
 
-        <button onClick={handleSkip} disabled={selected}
-          className="w-full py-3 text-purple-300 hover:text-white transition-colors disabled:opacity-50">
+        <button
+          onClick={handleSkip}
+          disabled={selected}
+          className="w-full py-3 text-white/25 hover:text-[#FFE033] uppercase tracking-widest text-sm transition-colors duration-200 disabled:opacity-30"
+        >
           Pomiń zagrywkę
         </button>
       </div>
