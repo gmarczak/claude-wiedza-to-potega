@@ -31,18 +31,31 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-6 animate-slide-up">
-          <h1 className="text-5xl font-black text-white text-shadow mb-2">Wiedza</h1>
-          <p className="text-2xl font-bold text-purple-300">to Potęga</p>
-          <div className="mt-2 inline-block px-4 py-1 bg-white/10 rounded-full">
-            <span className="text-sm font-semibold text-purple-200">2-6 graczy</span>
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Scanline overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-scanlines opacity-[0.04] z-10" />
+      {/* Ambient glow blobs */}
+      <div className="pointer-events-none absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-[#FFE033] opacity-[0.03] blur-3xl" />
+      <div className="pointer-events-none absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-[#00F5FF] opacity-[0.03] blur-3xl" />
+
+      <div className="w-full max-w-md relative z-20">
+        {/* Header */}
+        <div className="text-center mb-8 animate-slide-up">
+          <h1 className="font-orbitron text-5xl font-black uppercase tracking-widest text-[#FFE033] glow-text animate-neon-flicker">
+            Wiedza
+          </h1>
+          <p className="font-orbitron text-2xl font-bold uppercase tracking-[0.3em] text-[#00F5FF] glow-text-cyan mt-1">
+            to Potęga
+          </p>
+          <div className="mt-3 inline-block px-4 py-1 border border-[#FFE033]/30 bg-[#FFE033]/5">
+            <span className="text-xs font-semibold tracking-widest uppercase text-[#FFE033]/70">
+              2–6 graczy
+            </span>
           </div>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm text-center">
+          <div className="mb-4 p-3 border border-[#FF2D78]/50 bg-[#FF2D78]/10 text-[#FF2D78] text-sm text-center tracking-wide">
             {error}
           </div>
         )}
@@ -50,41 +63,48 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
         {mode === 'menu' && (
           <div className="space-y-4 animate-slide-up">
             <input
-              type="text" placeholder="Twoje imię..." value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)} maxLength={20}
-              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 text-lg"
+              type="text"
+              placeholder="Twoje imię..."
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              maxLength={20}
+              className="w-full px-4 py-3 bg-[#12121a] border border-[#FFE033]/30 text-white placeholder-white/30 focus:outline-none focus:border-[#FFE033] focus:shadow-[0_0_10px_rgba(255,224,51,0.3)] text-lg tracking-wide transition-all duration-200"
             />
 
             {/* Avatar selection */}
-            <div className="bg-white/10 rounded-xl p-4 border border-white/20">
-              <p className="text-purple-200 text-sm mb-3 font-medium">Wybierz postać</p>
+            <div className="bg-[#12121a] border border-[#FFE033]/20 p-4">
+              <p className="text-[#FFE033]/60 text-xs mb-3 font-semibold uppercase tracking-widest">
+                Wybierz postać
+              </p>
               <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto">
                 {AVATARS.map((avatar) => (
                   <button
                     key={avatar.id}
                     onClick={() => setSelectedAvatar(avatar.id)}
-                    className={`flex flex-col items-center p-2 rounded-xl transition-all ${
+                    className={`flex flex-col items-center p-2 transition-all duration-150 ${
                       selectedAvatar === avatar.id
-                        ? 'bg-white/20 ring-2 ring-purple-400 scale-105'
-                        : 'bg-white/5 hover:bg-white/10'
+                        ? 'bg-[#FFE033]/10 border border-[#FFE033] shadow-[0_0_8px_rgba(255,224,51,0.4)]'
+                        : 'bg-white/5 border border-transparent hover:border-[#FFE033]/30 hover:bg-white/10'
                     }`}
                   >
                     <span className="text-3xl mb-1">{avatar.emoji}</span>
-                    <span className="text-[10px] text-white/70">{avatar.name}</span>
+                    <span className="text-[10px] text-white/50 tracking-wide">{avatar.name}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <button
-              onClick={() => setMode('create')} disabled={!playerName.trim()}
-              className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold text-lg rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              onClick={() => setMode('create')}
+              disabled={!playerName.trim()}
+              className="w-full py-4 border-2 border-[#FFE033] text-[#FFE033] font-bold text-lg uppercase tracking-widest hover:bg-[#FFE033] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(255,224,51,0.5)] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed font-orbitron"
             >
               Stwórz Pokój
             </button>
             <button
-              onClick={() => setMode('join')} disabled={!playerName.trim()}
-              className="w-full py-4 bg-white/10 hover:bg-white/20 text-white font-bold text-lg rounded-xl border border-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => setMode('join')}
+              disabled={!playerName.trim()}
+              className="w-full py-4 border-2 border-[#00F5FF] text-[#00F5FF] font-bold text-lg uppercase tracking-widest hover:bg-[#00F5FF] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(0,245,255,0.5)] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed font-orbitron"
             >
               Dołącz do Pokoju
             </button>
@@ -93,12 +113,19 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
 
         {mode === 'create' && (
           <div className="space-y-4 animate-slide-up">
-            <div className="bg-white/10 rounded-xl p-4 space-y-4">
-              <h3 className="text-white font-semibold text-lg">Ustawienia gry</h3>
+            <div className="bg-[#12121a] border border-[#FFE033]/20 p-4 space-y-4">
+              <h3 className="font-orbitron text-[#FFE033] font-bold text-base uppercase tracking-widest">
+                Ustawienia gry
+              </h3>
               <div>
-                <label className="block text-purple-200 text-sm mb-1">Czas na odpowiedź</label>
-                <select value={settings.roundTime} onChange={(e) => setSettings({ ...settings, roundTime: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-400 [&>option]:bg-gray-800 [&>option]:text-white">
+                <label className="block text-[#FFE033]/60 text-xs mb-2 uppercase tracking-widest">
+                  Czas na odpowiedź
+                </label>
+                <select
+                  value={settings.roundTime}
+                  onChange={(e) => setSettings({ ...settings, roundTime: Number(e.target.value) })}
+                  className="w-full px-3 py-2 bg-[#0a0a0f] border border-[#FFE033]/30 text-white focus:outline-none focus:border-[#FFE033] [&>option]:bg-[#0a0a0f] [&>option]:text-white transition-all duration-200"
+                >
                   <option value={10}>10 sekund</option>
                   <option value={15}>15 sekund</option>
                   <option value={20}>20 sekund</option>
@@ -106,36 +133,62 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
                 </select>
               </div>
               <div>
-                <label className="block text-purple-200 text-sm mb-1">Trudność</label>
-                <select value={settings.difficulty} onChange={(e) => setSettings({ ...settings, difficulty: e.target.value })}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-400 [&>option]:bg-gray-800 [&>option]:text-white">
+                <label className="block text-[#FFE033]/60 text-xs mb-2 uppercase tracking-widest">
+                  Trudność
+                </label>
+                <select
+                  value={settings.difficulty}
+                  onChange={(e) => setSettings({ ...settings, difficulty: e.target.value })}
+                  className="w-full px-3 py-2 bg-[#0a0a0f] border border-[#FFE033]/30 text-white focus:outline-none focus:border-[#FFE033] [&>option]:bg-[#0a0a0f] [&>option]:text-white transition-all duration-200"
+                >
                   <option value="mixed">Mieszana</option>
                   <option value="easy">Łatwa</option>
                   <option value="medium">Średnia</option>
                   <option value="hard">Trudna</option>
                 </select>
               </div>
-              <p className="text-purple-300/60 text-xs">Format: 3 rundy pytań + minigra + 3 rundy + minigra + 3 rundy + Piramida Wiedzy</p>
+              <p className="text-white/30 text-xs leading-relaxed">
+                Format: 3 rundy pytań + minigra + 3 rundy + minigra + 3 rundy + Piramida Wiedzy
+              </p>
             </div>
-            <button onClick={handleCreate}
-              className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-lg rounded-xl transition-all shadow-lg">
+            <button
+              onClick={handleCreate}
+              className="w-full py-4 border-2 border-[#39FF14] text-[#39FF14] font-bold text-lg uppercase tracking-widest hover:bg-[#39FF14] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)] transition-all duration-200 font-orbitron"
+            >
               Stwórz Pokój
             </button>
-            <button onClick={() => setMode('menu')} className="w-full py-3 text-purple-300 hover:text-white transition-colors">Wróć</button>
+            <button
+              onClick={() => setMode('menu')}
+              className="w-full py-3 text-white/40 hover:text-[#FFE033] uppercase tracking-widest text-sm transition-colors duration-200"
+            >
+              Wróć
+            </button>
           </div>
         )}
 
         {mode === 'join' && (
           <div className="space-y-4 animate-slide-up">
-            <input type="text" placeholder="Kod pokoju (np. ABC123)" value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value.toUpperCase())} maxLength={6}
-              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400 text-lg text-center tracking-widest font-mono uppercase"
+            <input
+              type="text"
+              placeholder="Kod pokoju (np. ABC123)"
+              value={roomCode}
+              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+              maxLength={6}
+              className="w-full px-4 py-3 bg-[#12121a] border border-[#00F5FF]/30 text-[#00F5FF] placeholder-[#00F5FF]/30 focus:outline-none focus:border-[#00F5FF] focus:shadow-[0_0_10px_rgba(0,245,255,0.3)] text-xl text-center tracking-[0.5em] font-mono uppercase font-orbitron transition-all duration-200"
             />
-            <button onClick={handleJoin} disabled={!roomCode.trim()}
-              className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-lg rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+            <button
+              onClick={handleJoin}
+              disabled={!roomCode.trim()}
+              className="w-full py-4 border-2 border-[#39FF14] text-[#39FF14] font-bold text-lg uppercase tracking-widest hover:bg-[#39FF14] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed font-orbitron"
+            >
               Dołącz
             </button>
-            <button onClick={() => setMode('menu')} className="w-full py-3 text-purple-300 hover:text-white transition-colors">Wróć</button>
+            <button
+              onClick={() => setMode('menu')}
+              className="w-full py-3 text-white/40 hover:text-[#FFE033] uppercase tracking-widest text-sm transition-colors duration-200"
+            >
+              Wróć
+            </button>
           </div>
         )}
       </div>
