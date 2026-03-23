@@ -1,207 +1,255 @@
 ---
-name: wiedza-to-potega-restyle
-description: Restyling gry quizowej "Wiedza to Potęga" — zmiana wyglądu bez naruszania logiki gry. Triggeruj gdy użytkownik prosi o zmianę stylu, wyglądu, kolorów, animacji lub UI dowolnego ekranu tej aplikacji.
+name: wiedza-to-potega-tv-mode
+description: Implementacja trybu TV dla gry "Wiedza to Potęga". Triggeruj gdy użytkownik prosi o tryb TV, ekran display, podział na telefony graczy i ekran główny, lub QR kod do dołączenia.
 ---
 
-# Skill: Restyle "Wiedza to Potęga"
+# Skill: Tryb TV — "Wiedza to Potęga"
 
-Twoim zadaniem jest **wyłącznie zmiana warstwy wizualnej** — CSS, klasy Tailwind, fonty, kolory, animacje, układ. Logika gry (Socket.io, stany, eventy, props, typy) pozostaje nienaruszona.
+## Cel funkcji
 
----
-
-## Stack techniczny projektu
-
-- **React + TypeScript + Vite**
-- **Tailwind CSS** (bez custom konfiguracji theme — używaj tylko utility classes)
-- **Animacje**: zdefiniowane w `client/src/index.css` jako `@keyframes` + named klasy `.animate-*`
-- Fonty ładowane z Google Fonts przez `@import` w `index.css`
-- Brak bibliotek animacyjnych (Framer Motion, GSAP itp.) — czysty CSS
-
----
-
-## Struktura plików UI (tylko te dotykaj przy restylu)
+Gra toczy się na **dużym ekranie TV/projektora** (laptop podłączony do TV).
+Każdy gracz odpowiada na swoim **telefonie**.
+Host = jeden z graczy — ma laptop przy TV i telefon w ręku.
 
 ```
-client/src/
-├── index.css                    ← GŁÓWNE MIEJSCE NA ZMIANY (kolory, fonty, animacje)
-├── components/
-│   ├── HomeScreen.tsx           ← Ekran startowy (wybór awatara, imię, pokój)
-│   ├── LobbyScreen.tsx          ← Poczekalnia
-│   ├── CategoryVoteScreen.tsx   ← Głosowanie na kategorię
-│   ├── PowerUpScreen.tsx        ← Wybór zagrywki (Szlam, Dziobak, Lód, Bomba)
-│   ├── CountdownScreen.tsx      ← Odliczanie przed pytaniem
-│   ├── QuestionScreen.tsx       ← Pytanie + 4 odpowiedzi + timer
-│   ├── RevealScreen.tsx         ← Ujawnienie odpowiedzi + punkty
-│   ├── MiniGameScreen.tsx       ← Minigry (łączenie par, sortowanie)
-│   ├── PyramidScreen.tsx        ← Piramida Wiedzy (finał)
-│   ├── FinishedScreen.tsx       ← Ekran końcowy + ranking
-│   └── HostComment.tsx          ← Komentarze prowadzącego Maksa
+Laptop (TV)          Telefony graczy
+/?mode=display  ←→  /?mode=player  (każdy gracz)
+pokazuje grę         pokazuje tylko odpowiedzi
 ```
 
 ---
 
-## Zasady bezpiecznego restylu
+## Zasada nadrzędna
 
-### ✅ Możesz zmieniać
-- Wszystkie **klasy Tailwind** w `className={...}`
-- Plik **`index.css`**: `@import` fontów, `@keyframes`, klasy `.animate-*`, CSS variables
-- Kolory gradientów tła (`from-X via-Y to-Z`)
-- Zaokrąglenia (`rounded-*`), cienie (`shadow-*`), padding/margin
-- Typografię (`font-*`, `text-*`, `tracking-*`, `leading-*`)
-- Nowe animacje CSS w `index.css`
-- Tło i atmosferę (pseudoelementy via `@layer`, noise texture w CSS)
-
-### ❌ Nigdy nie ruszaj
-- Logiki Socket.io (`socket.ts`, eventy `emit`/`on`)
-- Propsów i interfejsów TypeScript (`interface Props { ... }`)
-- Handlerów zdarzeń (`onAnswer`, `onSelect`, `onSkip`, `onCreateRoom`, itp.)
-- Stanu gry (`useState` dla logiki, nie wyglądu)
-- Pliku `types.ts`
-- Backendu (`server/`)
-- `sounds.ts`
+Logika gry w `server/src/app.ts` **nie zmienia się**.
+Serwer nadal emituje te same eventy do room (`io.to(room.id).emit(...)`).
+Zmiana polega na tym że **klient subskrybuje te same eventy ale renderuje inny widok** — zależnie od `?mode=`.
 
 ---
 
-## Aktualny styl (co zastępujesz)
+## Plan implementacji — krok po kroku
 
-Obecny wygląd to **generic AI vibe**:
-- Font: `Inter` (najbardziej generyczny font na świecie)
-- Tło: `bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900` (wszędzie to samo)
-- Przyciski: `bg-gradient-to-r from-indigo-500 to-purple-600` (standardowy vibecode)
-- Karty: `bg-white/10 border border-white/20 rounded-xl` (szklane karty)
-- Animacje: podstawowe slide-up, scale-in, bounce-in
+### KROK 1 — Routing po URL param (frontend)
 
----
+W `client/src/App.tsx` dodaj wykrywanie trybu:
 
-## Docelowa estetyka: GAME SHOW / RETRO-FUTURISTIC
-
-Gra jest quizem dla 2-6 graczy, inspirowanym teleturniejem. Docelowy vibe:
-
-**Opcja A — Neon Arcade (rekomendowana)**
-- Tło: ciemne, prawie czarne `#0a0a0f` z neonowymi akcentami
-- Kolory: elektryczny żółty `#FFE033`, cyan `#00F5FF`, magenta `#FF2D78`
-- Font: `Rajdhani` lub `Orbitron` (wyświetlacze cyfrowe) + `Nunito` lub `Exo 2` (body)
-- Efekty: glow na tekście (`text-shadow: 0 0 20px`), scanlines overlay, CRT-like borders
-- Przyciski: ostre rogi lub pill shape, neonowy border zamiast fill
-
-**Opcja B — Gameshow Gold**
-- Tło: głęboki granat `#0D1B2A` z akcentami złota `#FFD700`
-- Font: `Bebas Neue` (headers) + `Barlow Condensed` (body)
-- Efekty: złote gradienty, confetti particles, spotlight effect
-- Przycisk odpowiedzi: duże, kolorowe bloki jak w teleturnieju (czerwony, niebieski, żółty, zielony) — BEZ gradientu, flat + border
-
-**Opcja C — Brutalist Quiz**
-- Tło: białe lub krem `#F5F0E8`
-- Font: `Anton` lub `Black Han Sans` (headers) + `IBM Plex Mono` (body)
-- Kolory: czarny + jeden intensywny kolor akcentowy (np. `#FF3300`)
-- Układ: grube bordery `4px solid black`, box-shadow jako pseudo-cień, zero zaokrągleń
-
----
-
-## Wzorzec zmiany — przykład HomeScreen
-
-**Przed (generic):**
-```tsx
-<div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
-  <h1 className="text-5xl font-black text-white">Wiedza</h1>
-  <button className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-xl">
-    Stwórz Pokój
-  </button>
+```typescript
+const urlParams = new URLSearchParams(window.location.search);
+const appMode = urlParams.get('mode') as 'display' | 'player' | null;
+// null = domyślny tryb (obecne zachowanie)
 ```
 
-**Po (Neon Arcade):**
-```tsx
-<div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
-  {/* scanline overlay */}
-  <div className="pointer-events-none absolute inset-0 bg-scanlines opacity-[0.03] z-10" />
-  <h1 className="text-5xl font-black text-neon-yellow tracking-widest uppercase glow-text">Wiedza</h1>
-  <button className="w-full py-4 border-2 border-neon-yellow text-neon-yellow font-bold uppercase tracking-widest hover:bg-neon-yellow hover:text-black transition-all duration-200">
-    Stwórz Pokój
-  </button>
-```
+Logika:
+- `?mode=display` → renderuj `<DisplayApp />` (nowy komponent — tylko TV)
+- `?mode=player` lub brak → renderuj obecny `<App />` (bez zmian)
 
 ---
 
-## Przepis na zmianę index.css
+### KROK 2 — DisplayApp.tsx (nowy plik)
 
-Przy każdym restylu **zastąp** górną część `index.css`:
+Lokalizacja: `client/src/DisplayApp.tsx`
 
-```css
-/* 1. Nowe fonty */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@400;600;800&display=swap');
+Ten komponent:
+- Łączy się z tym samym socketem co gracze
+- Dołącza do pokoju jako **obserwator** (nie jako gracz — nie emituje `room:join`)
+- Słucha tych samych eventów co gracze (`game:question`, `game:tick`, `game:reveal`, itp.)
+- Renderuje **duże ekrany dla TV** (różne komponenty niż te używane przez graczy)
 
-/* 2. CSS variables dla całego projektu */
-:root {
-  --color-bg: #0a0a0f;
-  --color-surface: #12121a;
-  --color-primary: #FFE033;
-  --color-secondary: #00F5FF;
-  --color-danger: #FF2D78;
-  --color-success: #39FF14;
-  --glow-primary: 0 0 20px var(--color-primary), 0 0 40px var(--color-primary);
-  --glow-secondary: 0 0 20px var(--color-secondary);
+```typescript
+// DisplayApp.tsx — szkielet
+import { useEffect, useState } from 'react';
+import { socket } from './socket';
+
+export default function DisplayApp() {
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [phase, setPhase] = useState<string>('waiting');
+  // ... reszta stanu
+
+  useEffect(() => {
+    // Dołącz do pokoju jako display (bez podawania imienia)
+    socket.emit('display:join', { roomId });
+
+    socket.on('game:question', (data) => { /* ... */ });
+    socket.on('game:reveal', (data) => { /* ... */ });
+    // itd.
+
+    return () => { socket.removeAllListeners(); };
+  }, [roomId]);
+
+  if (!roomId) return <DisplayWaitingScreen onJoin={setRoomId} />;
+  // renderuj odpowiedni ekran TV zależnie od phase
 }
-
-/* 3. Base */
-body {
-  font-family: 'Exo 2', sans-serif;
-  background-color: var(--color-bg);
-  color: #fff;
-}
-
-/* 4. Nowe klasy pomocnicze */
-.glow-text { text-shadow: var(--glow-primary); }
-.glow-text-cyan { text-shadow: var(--glow-secondary); }
-.surface { background: var(--color-surface); }
-.border-glow { border: 1px solid var(--color-primary); box-shadow: var(--glow-primary); }
-
-/* 5. Zachowaj stare animacje (są używane w logice!) */
-/* ... (zostaw wszystkie @keyframes i .animate-* bez zmian) */
 ```
 
 ---
 
-## Kolory odpowiedzi w QuestionScreen
+### KROK 3 — Nowy event na serwerze: display:join
 
-Odpowiedzi A/B/C/D mają zawsze 4 kolory — zachowaj tę koncepcję, zmień tylko kolory:
+W `server/src/app.ts` dodaj obsługę nowego eventu.
+Display NIE jest graczem — dołącza do room jako obserwator.
+
+```typescript
+// W ClientToServerEvents (types.ts) dodaj:
+'display:join': (data: { roomId: string }) => void;
+
+// W app.ts dodaj handler:
+socket.on('display:join', ({ roomId }) => {
+  const room = rooms.get(roomId.toUpperCase());
+  if (!room) {
+    socket.emit('room:error', 'Pokój nie istnieje');
+    return;
+  }
+  // Dołącz socket do room bez dodawania do room.players
+  socket.join(roomId.toUpperCase());
+  // Wyślij aktualny stan gry (żeby display wiedział gdzie jesteśmy)
+  socket.emit('room:joined', getRoomState(room));
+});
+```
+
+Kluczowe: display nie jest w `room.players`, więc nie dostaje power-upów, nie może głosować, nie liczy się do `allAnswered`.
+
+---
+
+### KROK 4 — Ekrany TV (nowe komponenty)
+
+Lokalizacja: `client/src/display/`
+
+Stwórz osobne komponenty dla widoku TV — większa czcionka, pełny ekran, bez przycisków odpowiedzi:
+
+```
+client/src/display/
+├── DisplayWaitingScreen.tsx   ← kod pokoju + QR kod do dołączenia
+├── DisplayLobbyScreen.tsx     ← lista graczy którzy dołączyli
+├── DisplayQuestionScreen.tsx  ← pytanie na cały ekran + timer + avatary
+├── DisplayRevealScreen.tsx    ← kto odpowiedział co + punkty
+├── DisplayScoreScreen.tsx     ← ranking między rundami
+└── DisplayFinishedScreen.tsx  ← ekran końcowy
+```
+
+**DisplayWaitingScreen** — najważniejszy:
+```tsx
+// Pokazuje kod pokoju i QR kod
+// URL do QR: `${window.location.origin}/?mode=player&room=XXXXXX`
+// Użyj biblioteki `qrcode.react` lub generuj QR przez API:
+// `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=URL`
+```
+
+**DisplayQuestionScreen** — główny widok podczas gry:
+```tsx
+// - Pytanie dużą czcionką (center screen)
+// - 4 odpowiedzi jako kolorowe bloki (nie klikalne — tylko informacyjne)
+// - Timer (pasek + liczba)
+// - Avatary graczy na dole z indicatorem "odpowiedział/nie odpowiedział"
+// - NIE pokazuj która odpowiedź jest zaznaczona przez gracza (suspens!)
+```
+
+---
+
+### KROK 5 — Ekran gracza na telefonie (PlayerView)
+
+Ekran gracza na telefonie powinien być **uproszczony**:
+- Tylko 4 duże przyciski A/B/C/D (łatwe do kliknięcia na telefonie)
+- Własny wynik + pozycja w rankingu
+- Timer
+- BEZ pełnej treści pytania (jest na TV — oszczędza ekran telefonu)
+  - Opcjonalnie: krótki tekst pytania jako reminder
+
+Możesz to zrobić jako osobny komponent `PlayerQuestionScreen.tsx` lub jako wariant obecnego `QuestionScreen.tsx` z propem `compact={true}`.
+
+---
+
+### KROK 6 — QR kod do dołączenia
+
+W `DisplayWaitingScreen` wygeneruj QR automatycznie:
 
 ```tsx
-// PRZED (generic gradienty):
-const answerColors = [
-  'from-red-500 to-red-600 hover:from-red-600 hover:to-red-700',
-  'from-blue-500 to-blue-600 ...',
-  'from-yellow-500 to-yellow-600 ...',
-  'from-green-500 to-green-600 ...',
-];
+const playerUrl = `${window.location.origin}/?mode=player`;
+const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(playerUrl)}`;
 
-// PO (neon flat):
-const answerColors = [
-  'bg-transparent border-2 border-[#FF2D78] text-[#FF2D78] hover:bg-[#FF2D78] hover:text-black',
-  'bg-transparent border-2 border-[#00F5FF] text-[#00F5FF] hover:bg-[#00F5FF] hover:text-black',
-  'bg-transparent border-2 border-[#FFE033] text-[#FFE033] hover:bg-[#FFE033] hover:text-black',
-  'bg-transparent border-2 border-[#39FF14] text-[#39FF14] hover:bg-[#39FF14] hover:text-black',
-];
+// Wyświetl:
+// 1. Duży kod pokoju (np. "ABC123") — Orbitron, neonowy żółty
+// 2. QR kod jako <img src={qrUrl} />
+// 3. Instrukcja: "Zeskanuj QR lub wejdź na [URL] i wpisz kod"
 ```
+
+Gracz po zeskanowaniu wchodzi na stronę w `?mode=player`, wpisuje imię, avatar i kod pokoju — normalny flow `room:join`.
 
 ---
 
-## Checklist przed commitem
+## Zmiany w istniejących plikach
 
-- [ ] Logika gry działa identycznie (przetestuj pełną grę 2-osobową)
-- [ ] Wszystkie animacje `.animate-*` nadal działają (są używane w TSX)  
-- [ ] Timer urgency w QuestionScreen nadal zmienia kolor przy ≤5s
-- [ ] PowerUp efekty (slime overlay, frozen, bomb shake) nadal widoczne
-- [ ] Ekran finałowy — konfetti nadal odpala się po zwycięstwie
-- [ ] Responsywność: działa na mobile (telefony graczy!)
-- [ ] `npm run build` bez błędów TS
+### server/src/types.ts
+```typescript
+// Dodaj do ClientToServerEvents:
+'display:join': (data: { roomId: string }) => void;
+```
+
+### client/src/App.tsx
+```typescript
+// Dodaj na początku:
+const urlParams = new URLSearchParams(window.location.search);
+const isDisplayMode = urlParams.get('mode') === 'display';
+
+// W return:
+if (isDisplayMode) return <DisplayApp />;
+// reszta bez zmian
+```
+
+### client/src/socket.ts
+Bez zmian — ten sam socket używany przez display i player.
 
 ---
 
-## Ważna uwaga o Tailwind
+## Czego NIE zmieniać
 
-Projekt używa standardowego Tailwind **bez** custom theme. Arbitralne kolory wpisuj jako:
-```tsx
-className="bg-[#0a0a0f] text-[#FFE033] border-[#00F5FF]"
+- `server/src/app.ts` — logika gry, timery, punkty, power-upy
+- `server/src/questions.ts` — pytania
+- `client/src/components/` — istniejące ekrany (gracze na telefonach nadal je używają)
+- `client/src/types.ts` — typy gry
+- `client/src/sounds.ts`
+
+---
+
+## Kolejność implementacji (zalecana)
+
+1. `display:join` event na serwerze (5 min)
+2. Detekcja `?mode=` w `App.tsx` (5 min)
+3. `DisplayApp.tsx` — szkielet z podłączeniem do socketa (20 min)
+4. `DisplayWaitingScreen.tsx` — kod pokoju + QR (20 min)
+5. `DisplayLobbyScreen.tsx` — lista graczy (15 min)
+6. `DisplayQuestionScreen.tsx` — główny ekran gry (45 min)
+7. `DisplayRevealScreen.tsx` — ujawnienie odpowiedzi (20 min)
+8. `DisplayFinishedScreen.tsx` — ekran końcowy (15 min)
+9. Uproszczony `PlayerQuestionScreen` na telefon (opcjonalnie, 30 min)
+
+---
+
+## Estetyka ekranów TV
+
+Ekrany TV to **duże, czytelne widoki** — oglądane z odległości 2-3m.
+
+- Czcionki minimum `text-4xl` dla pytania, `text-6xl` dla kodu pokoju
+- Timer jako duży pasek na górze ekranu
+- Avatary graczy z indicatorem ✓/? (odpowiedział / czeka)
+- Tło: takie samo jak reszta gry (`#0a0a0f` + neon)
+- Brak przycisków odpowiedzi — tylko informacja
+
+---
+
+## Testowanie lokalne
+
+```bash
+# Terminal 1
+npm run dev
+
+# Okno 1 (symulacja TV):
+# http://localhost:5173/?mode=display
+
+# Okno 2 (gracz 1 — host na telefonie):
+# http://localhost:5173/
+
+# Okno 3 (gracz 2):
+# http://localhost:5173/
 ```
 
-Lub dodaj zmienne CSS w `index.css` i odwołuj się przez `var(--color-primary)` w `style={{}}`.
+Na produkcji (Vercel) działa identycznie — URL param `?mode=display` jest obsługiwany przez React Router / window.location na frontendzie.
