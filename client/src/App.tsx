@@ -17,8 +17,12 @@ import MiniGameScreen from './components/MiniGameScreen';
 import { PyramidIntro, PyramidQuestion, PyramidReveal } from './components/PyramidScreen';
 import FinishedScreen from './components/FinishedScreen';
 import HostComment from './components/HostComment';
+import DisplayApp from './DisplayApp';
 
 function App() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('mode') === 'display') return <DisplayApp />;
+
   const [screen, setScreen] = useState<GameScreen>('home');
   const [room, setRoom] = useState<RoomState | null>(null);
   const [countdown, setCountdown] = useState(3);

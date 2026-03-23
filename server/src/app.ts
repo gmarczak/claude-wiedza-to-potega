@@ -398,6 +398,13 @@ export function createApp(allowedOrigins: string[] = ['http://localhost:5173']) 
       socket.emit('room:joined', getRoomState(room));
     });
 
+    socket.on('display:join', ({ roomId }) => {
+      const room = rooms.get(roomId.toUpperCase());
+      if (!room) { socket.emit('error', 'Pokój nie istnieje'); return; }
+      socket.join(roomId.toUpperCase());
+      socket.emit('room:joined', getRoomState(room));
+    });
+
     socket.on('game:start', () => {
       const room = findRoom(socket.id);
       if (!room || room.players.length < 2 || room.phase !== 'waiting') return;

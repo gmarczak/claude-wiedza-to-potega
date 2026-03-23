@@ -185,6 +185,7 @@ export interface ClientToServerEvents {
   'game:answer': (answerIndex: number) => void;
   'game:minigame-result': (score: number) => void;
   'game:pyramid-answer': (answerIndex: number) => void;
+  'display:join': (data: { roomId: string }) => void;
 }
 
 // ===== DATA TYPES (sent to clients) =====
