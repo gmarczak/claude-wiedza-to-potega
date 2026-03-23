@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { socket } from './socket';
 import type {
-  RoomState, QuestionData, RevealData, GameResult, GameSettings,
+  RoomState, QuestionData, RevealData, GameResult,
   CategoryVoteData, CategoryResultData,
   MiniGameData, MiniGameResultsData, PyramidIntroData, PyramidQuestionData, PyramidRevealData,
 } from './types';
@@ -26,7 +26,7 @@ export default function DisplayApp() {
   const urlParams = new URLSearchParams(window.location.search);
   const urlRoom = urlParams.get('room')?.toUpperCase() ?? null;
 
-  const [roomId, setRoomId] = useState<string | null>(urlRoom);
+  const [, setRoomId] = useState<string | null>(urlRoom);
   const [inputRoom, setInputRoom] = useState('');
   const [phase, setPhase] = useState<DisplayPhase>(urlRoom ? 'lobby' : 'enter-room');
   const [room, setRoom] = useState<RoomState | null>(null);
@@ -40,9 +40,9 @@ export default function DisplayApp() {
   const [categoryResult, setCategoryResult] = useState<CategoryResultData | null>(null);
   const [miniGameData, setMiniGameData] = useState<MiniGameData | null>(null);
   const [miniGameResults, setMiniGameResults] = useState<MiniGameResultsData | null>(null);
-  const [pyramidIntro, setPyramidIntro] = useState<PyramidIntroData | null>(null);
+  const [, setPyramidIntro] = useState<PyramidIntroData | null>(null);
   const [pyramidQuestion, setPyramidQuestion] = useState<PyramidQuestionData | null>(null);
-  const [pyramidReveal, setPyramidReveal] = useState<PyramidRevealData | null>(null);
+  const [, setPyramidReveal] = useState<PyramidRevealData | null>(null);
 
   const joinRoom = (id: string) => {
     const upper = id.toUpperCase();
