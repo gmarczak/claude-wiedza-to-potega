@@ -14,16 +14,28 @@ interface Props {
 }
 
 const answerColors = [
-  'from-red-500 to-red-600 hover:from-red-600 hover:to-red-700',
-  'from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700',
-  'from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700',
-  'from-green-500 to-green-600 hover:from-green-600 hover:to-green-700',
+  'border-[#FF2D78] text-[#FF2D78] hover:bg-[#FF2D78] hover:text-[#0a0a0f]',
+  'border-[#00F5FF] text-[#00F5FF] hover:bg-[#00F5FF] hover:text-[#0a0a0f]',
+  'border-[#FFE033] text-[#FFE033] hover:bg-[#FFE033] hover:text-[#0a0a0f]',
+  'border-[#39FF14] text-[#39FF14] hover:bg-[#39FF14] hover:text-[#0a0a0f]',
+];
+const answerSelectedColors = [
+  'bg-[#FF2D78] text-[#0a0a0f] border-[#FF2D78]',
+  'bg-[#00F5FF] text-[#0a0a0f] border-[#00F5FF]',
+  'bg-[#FFE033] text-[#0a0a0f] border-[#FFE033]',
+  'bg-[#39FF14] text-[#0a0a0f] border-[#39FF14]',
+];
+const answerGlows = [
+  '0 0 16px rgba(255,45,120,0.5)',
+  '0 0 16px rgba(0,245,255,0.5)',
+  '0 0 16px rgba(255,224,51,0.5)',
+  '0 0 16px rgba(57,255,20,0.5)',
 ];
 const answerLabels = ['A', 'B', 'C', 'D'];
 const difficultyLabels: Record<string, { text: string; color: string }> = {
-  easy: { text: 'Łatwe', color: 'bg-green-500/20 text-green-300' },
-  medium: { text: 'Średnie', color: 'bg-yellow-500/20 text-yellow-300' },
-  hard: { text: 'Trudne', color: 'bg-red-500/20 text-red-300' },
+  easy: { text: 'Łatwe', color: 'border border-[#39FF14]/40 text-[#39FF14]/70' },
+  medium: { text: 'Średnie', color: 'border border-[#FFE033]/40 text-[#FFE033]/70' },
+  hard: { text: 'Trudne', color: 'border border-[#FF2D78]/40 text-[#FF2D78]/70' },
 };
 
 function applyPlatypus(text: string, seed: number): string {
@@ -106,10 +118,9 @@ export default function QuestionScreen({ question, timeLeft, room, playerId, pow
   }, [slimeCleared]);
 
   const timerPercent = (timeLeft / question.timeLimit) * 100;
-  const timerColor = timeLeft <= 5 ? 'bg-red-500' : timeLeft <= 10 ? 'bg-yellow-500' : 'bg-green-500';
+  const timerColor = timeLeft <= 5 ? 'bg-[#FF2D78]' : timeLeft <= 10 ? 'bg-[#FFE033]' : 'bg-[#39FF14]';
   const difficulty = difficultyLabels[question.difficulty] || difficultyLabels.easy;
 
-  // Show all players' scores in header for multiplayer
   const sortedPlayers = [...room.players].sort((a, b) => b.score - a.score);
 
   const hasSlime = powerUpHit?.type === 'slime' && !slimeCleared;
@@ -117,28 +128,44 @@ export default function QuestionScreen({ question, timeLeft, room, playerId, pow
   const displayOrder = bombTriggered ? shuffledOrder : [0, 1, 2, 3];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex flex-col relative">
+    <div className="min-h-screen bg-[#0a0a0f] flex flex-col relative overflow-hidden">
+      {/* Scanline overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-scanlines opacity-[0.04] z-10" />
+
       {/* Freeze overlay */}
       {frozen && (
-        <div className="absolute inset-0 z-50 bg-cyan-400/30 backdrop-blur-sm flex items-center justify-center animate-fade-in">
-          <div className="text-center animate-countdown">
+        <div className="absolute inset-0 z-50 bg-[#00F5FF]/20 backdrop-blur-sm flex items-center justify-center animate-fade-in">
+          <div className="text-center animate-countdown border border-[#00F5FF]/40 bg-[#0a0a0f]/80 px-10 py-8">
             <span className="text-6xl">🧊</span>
-            <p className="text-white text-xl font-bold mt-2">Zamrożony!</p>
-            <p className="text-cyan-200 text-sm">{powerUpHit?.fromPlayerName} zamroził Twój ekran!</p>
+            <p className="font-orbitron text-[#00F5FF] text-xl font-bold mt-3 uppercase tracking-widest glow-text-cyan">
+              Zamrożony!
+            </p>
+            <p className="text-[#00F5FF]/50 text-xs mt-1 uppercase tracking-wide">
+              {powerUpHit?.fromPlayerName} zamroził Twój ekran!
+            </p>
           </div>
         </div>
       )}
 
       {/* Slime overlay */}
       {hasSlime && (
-        <div className="absolute inset-x-0 bottom-0 z-40 flex items-end justify-center pointer-events-auto"
-          style={{ top: '40%' }} onClick={handleSlimeClick}>
-          <div className="w-full h-full bg-green-500/70 backdrop-blur-md flex items-center justify-center cursor-pointer"
-            style={{ opacity: 1 - slimeClicks / 8 }}>
+        <div
+          className="absolute inset-x-0 bottom-0 z-40 pointer-events-auto"
+          style={{ top: '40%' }}
+          onClick={handleSlimeClick}
+        >
+          <div
+            className="w-full h-full bg-[#39FF14]/60 backdrop-blur-md flex items-center justify-center cursor-pointer"
+            style={{ opacity: 1 - slimeClicks / 8 }}
+          >
             <div className="text-center">
               <span className="text-5xl">🟢</span>
-              <p className="text-white font-bold mt-2">Szlam! Klikaj aby wytrzeć! ({slimeClicks}/8)</p>
-              <p className="text-green-200 text-xs">{powerUpHit?.fromPlayerName} zamazał Twoje odpowiedzi</p>
+              <p className="font-orbitron text-white font-bold mt-2 uppercase tracking-widest">
+                Szlam! Klikaj aby wytrzeć! ({slimeClicks}/8)
+              </p>
+              <p className="text-[#39FF14]/70 text-xs mt-1 uppercase tracking-wide">
+                {powerUpHit?.fromPlayerName} zamazał Twoje odpowiedzi
+              </p>
             </div>
           </div>
         </div>
@@ -146,56 +173,86 @@ export default function QuestionScreen({ question, timeLeft, room, playerId, pow
 
       {/* Power-up notifications */}
       {powerUpHit && !frozen && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 bg-orange-500/90 text-white px-4 py-2 rounded-full text-sm font-semibold animate-slide-down">
-          {powerUpHit.fromPlayerName} użył: {powerUpHit.type === 'slime' ? 'Szlam' : powerUpHit.type === 'platypus' ? 'Dziobak' : powerUpHit.type === 'ice' ? 'Lód' : 'Bomba'}!
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 border border-[#FF2D78]/50 bg-[#0a0a0f]/90 text-[#FF2D78] px-5 py-2 text-xs font-semibold uppercase tracking-widest animate-slide-down">
+          {powerUpHit.fromPlayerName} użył:{' '}
+          {powerUpHit.type === 'slime' ? 'Szlam' : powerUpHit.type === 'platypus' ? 'Dziobak' : powerUpHit.type === 'ice' ? 'Lód' : 'Bomba'}!
         </div>
       )}
       {hasDouble && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 bg-yellow-500/90 text-white px-4 py-2 rounded-full text-sm font-semibold animate-slide-down animate-glow">
-          ✨ Podwójne punkty aktywne! ✨
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 border border-[#FFE033]/60 bg-[#0a0a0f]/90 text-[#FFE033] px-5 py-2 text-xs font-bold uppercase tracking-widest animate-slide-down animate-glow">
+          ✦ Podwójne punkty aktywne! ✦
         </div>
       )}
 
-      {/* Header - scoreboard */}
-      <div className="p-3">
+      {/* Header — scoreboard */}
+      <div className="p-3 relative z-20">
         <div className="flex items-center justify-between mb-2 gap-1 flex-wrap">
           {sortedPlayers.map((p) => {
             const avatar = AVATARS.find(a => a.id === p.avatarId) || AVATARS[0];
             const isMe = p.id === playerId;
             return (
-              <div key={p.id} className={`flex items-center gap-1 px-2 py-1 rounded-lg ${isMe ? 'bg-white/15 ring-1 ring-purple-400' : 'bg-white/5'}`}>
+              <div
+                key={p.id}
+                className={`flex items-center gap-1 px-2 py-1 ${
+                  isMe
+                    ? 'bg-[#FFE033]/10 border border-[#FFE033]/40'
+                    : 'bg-white/5 border border-white/5'
+                }`}
+              >
                 <span className="text-sm">{avatar.emoji}</span>
-                <span className={`text-xs ${isMe ? 'text-white font-semibold' : 'text-purple-300'}`}>{p.score}</span>
+                <span className={`text-xs font-mono ${isMe ? 'text-[#FFE033] font-bold' : 'text-white/40'}`}>
+                  {p.score}
+                </span>
               </div>
             );
           })}
         </div>
+
+        {/* Timer bar */}
         <div className="flex items-center gap-2 mb-1">
-          <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-            <div className={`h-full ${timerColor} rounded-full transition-all duration-1000 ease-linear`} style={{ width: `${timerPercent}%` }} />
+          <div className="flex-1 h-1.5 bg-white/10 overflow-hidden">
+            <div
+              className={`h-full ${timerColor} transition-all duration-1000 ease-linear`}
+              style={{ width: `${timerPercent}%` }}
+            />
           </div>
-          <span className={`text-sm font-mono font-bold min-w-[2rem] text-right ${timeLeft <= 5 ? 'text-red-400 animate-timer-urgent' : 'text-white'}`}>{timeLeft}s</span>
+          <span className={`font-orbitron text-sm font-bold min-w-[2.5rem] text-right ${
+            timeLeft <= 5 ? 'text-[#FF2D78] glow-text-danger animate-timer-urgent' : 'text-white/60'
+          }`}>
+            {timeLeft}s
+          </span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-purple-300 text-xs font-medium">{question.questionNumber}/{question.totalQuestions}</span>
-          <span className={`text-xs px-2 py-0.5 rounded-full ${difficulty.color}`}>{difficulty.text}</span>
+
+        <div className="flex justify-between items-center">
+          <span className="text-white/30 text-xs font-mono">
+            {question.questionNumber}/{question.totalQuestions}
+          </span>
+          <span className={`text-[10px] px-2 py-0.5 uppercase tracking-widest font-semibold ${difficulty.color}`}>
+            {difficulty.text}
+          </span>
         </div>
       </div>
 
       {/* Question */}
-      <div className="flex-1 flex flex-col justify-center px-4 pb-4">
+      <div className="flex-1 flex flex-col justify-center px-4 pb-4 relative z-20">
         <div className="mb-2 text-center">
-          <span className="text-purple-300 text-xs font-medium">{question.category}</span>
+          <span className="text-[#FFE033]/40 text-xs uppercase tracking-widest">{question.category}</span>
         </div>
 
         {question.imageUrl && (
           <div className="flex justify-center mb-4">
-            <img src={question.imageUrl} alt="Pytanie" className="max-h-40 rounded-xl border-2 border-white/20 object-contain animate-scale-in" />
+            <img
+              src={question.imageUrl}
+              alt="Pytanie"
+              className="max-h-40 border border-[#FFE033]/20 object-contain animate-scale-in"
+            />
           </div>
         )}
 
-        <div className="bg-white/10 rounded-2xl p-5 mb-5 border border-white/20 animate-scale-in">
-          <h2 className="text-lg md:text-xl font-bold text-white text-center leading-relaxed">{question.question}</h2>
+        <div className="bg-[#12121a] border border-[#FFE033]/15 p-5 mb-5 animate-scale-in">
+          <h2 className="text-lg md:text-xl font-bold text-white text-center leading-relaxed">
+            {question.question}
+          </h2>
         </div>
 
         {/* Answers */}
@@ -204,16 +261,26 @@ export default function QuestionScreen({ question, timeLeft, room, playerId, pow
             const answer = question.answers[origIndex];
             const displayText = platypusTexts ? platypusTexts[origIndex] : answer;
             const isHidden = hiddenAnswers.includes(origIndex);
+            const isSelected = selectedAnswer === origIndex;
+            const isDisabled = selectedAnswer !== null && !isSelected;
+
             return (
-              <button key={origIndex} onClick={() => handleAnswer(origIndex)}
+              <button
+                key={origIndex}
+                onClick={() => handleAnswer(origIndex)}
                 disabled={selectedAnswer !== null || frozen || isHidden}
-                className={`relative p-4 rounded-xl font-semibold text-white text-left transition-all ${
-                  isHidden ? 'opacity-20 bg-gray-700 cursor-not-allowed' :
-                  selectedAnswer === origIndex ? 'ring-4 ring-white scale-95 bg-gradient-to-r ' + answerColors[origIndex] :
-                  selectedAnswer !== null ? 'opacity-50 bg-gradient-to-r ' + answerColors[origIndex] :
-                  'bg-gradient-to-r ' + answerColors[origIndex] + ' hover:scale-[1.02] active:scale-95 shadow-lg'
-                }`}>
-                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-sm font-bold mr-3">
+                style={isSelected ? { boxShadow: answerGlows[origIndex] } : undefined}
+                className={`relative p-4 border-2 font-semibold text-left transition-all duration-200 ${
+                  isHidden
+                    ? 'opacity-20 border-white/10 text-white/30 cursor-not-allowed'
+                    : isSelected
+                    ? answerSelectedColors[origIndex] + ' scale-95'
+                    : isDisabled
+                    ? 'opacity-30 border-white/10 text-white/30 cursor-not-allowed'
+                    : answerColors[origIndex] + ' bg-[#12121a] hover:scale-[1.02] active:scale-95'
+                }`}
+              >
+                <span className="inline-flex items-center justify-center w-7 h-7 border border-current/50 bg-current/10 text-sm font-bold mr-3 font-orbitron">
                   {answerLabels[origIndex]}
                 </span>
                 {isHidden ? '—' : displayText}
@@ -223,7 +290,9 @@ export default function QuestionScreen({ question, timeLeft, room, playerId, pow
         </div>
 
         {selectedAnswer !== null && (
-          <p className="text-center text-purple-300 mt-4 animate-slide-up">Odpowiedź zapisana! Czekam na pozostałych...</p>
+          <p className="text-center text-[#00F5FF]/40 text-xs mt-4 uppercase tracking-widest animate-slide-up">
+            Odpowiedź zapisana! Czekam na pozostałych...
+          </p>
         )}
       </div>
     </div>
