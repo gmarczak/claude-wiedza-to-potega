@@ -263,6 +263,76 @@ export const builtInQuestions: Question[] = [
   { id: 'img-3', question: 'Który to instrument muzyczny?', answers: ['Flet', 'Klarnet', 'Obój', 'Saksofon'], correctIndex: 3, category: 'Muzyka', difficulty: 'medium', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Yamaha_Saxophone_YAS-62.jpg/120px-Yamaha_Saxophone_YAS-62.jpg' },
   { id: 'img-4', question: 'Jaka planeta jest widoczna na zdjęciu?', answers: ['Mars', 'Jowisz', 'Saturn', 'Neptun'], correctIndex: 2, category: 'Nauka', difficulty: 'medium', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Saturn_during_Equinox.jpg/300px-Saturn_during_Equinox.jpg' },
   { id: 'img-5', question: 'Które miasto przedstawia to zdjęcie?', answers: ['Nowy Jork', 'Londyn', 'Paryż', 'Tokio'], correctIndex: 2, category: 'Geografia', difficulty: 'easy', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Tour_Eiffel_Wikimedia_Commons.jpg/200px-Tour_Eiffel_Wikimedia_Commons.jpg' },
+
+  // ============================================================
+  // HISTORIA PL — medium/hard (10 questions)
+  // ============================================================
+  { id: 'pl-164', question: 'Kto podpisał Konstytucję 3 Maja 1791 roku jako król?', answers: ['August III Sas', 'Stanisław August Poniatowski', 'Jan III Sobieski', 'Zygmunt III Waza'], correctIndex: 1, category: 'Historia', difficulty: 'medium' },
+  { id: 'pl-165', question: 'Która bitwa z 1920 roku jest nazywana "Cudem nad Wisłą"?', answers: ['Bitwa pod Lwowem', 'Bitwa pod Warszawą', 'Bitwa pod Zamościem', 'Bitwa pod Radzyminem'], correctIndex: 1, category: 'Historia', difficulty: 'medium' },
+  { id: 'pl-166', question: 'W którym roku powstało Królestwo Polskie pod berłem cara Rosji?', answers: ['1807', '1815', '1830', '1863'], correctIndex: 1, category: 'Historia', difficulty: 'medium' },
+  { id: 'pl-167', question: 'Kto był przywódcą powstania kościuszkowskiego?', answers: ['Józef Poniatowski', 'Tadeusz Kościuszko', 'Jan Henryk Dąbrowski', 'Kazimierz Pułaski'], correctIndex: 1, category: 'Historia', difficulty: 'medium' },
+  { id: 'pl-168', question: 'Które miasto było pierwszą stolicą Polski?', answers: ['Kraków', 'Gniezno', 'Poznań', 'Wrocław'], correctIndex: 1, category: 'Historia', difficulty: 'medium' },
+  { id: 'pl-169', question: 'W którym roku Polska utraciła niepodległość w wyniku trzeciego rozbioru?', answers: ['1772', '1793', '1795', '1815'], correctIndex: 2, category: 'Historia', difficulty: 'medium' },
+  { id: 'pl-170', question: 'Jak nazywał się związek szlachty polskiej zawiązany w 1573 roku, zapewniający wolność wyznania?', answers: ['Unia Lubelska', 'Konfederacja Warszawska', 'Unia Horodelska', 'Artykuły Henrykowskie'], correctIndex: 1, category: 'Historia', difficulty: 'hard' },
+  { id: 'pl-171', question: 'W którym roku miało miejsce powstanie w getcie warszawskim?', answers: ['1941', '1942', '1943', '1944'], correctIndex: 2, category: 'Historia', difficulty: 'medium' },
+  { id: 'pl-172', question: 'Kto był pierwszym polskim papieżem?', answers: ['Jan Paweł I', 'Jan Paweł II', 'Pius XI', 'Jan XXIII'], correctIndex: 1, category: 'Historia', difficulty: 'medium' },
+  { id: 'pl-173', question: 'Który traktat z 1918 roku uznał niepodległość Polski?', answers: ['Traktat wersalski', 'Traktat brzeski', 'Traktat ryski', 'Traktat w Trianon'], correctIndex: 0, category: 'Historia', difficulty: 'hard' },
+
+  // ============================================================
+  // POPKULTURA — easy/medium (10 questions)
+  // ============================================================
+  { id: 'pl-174', question: 'Jak nazywa się czarodziejska szkoła w serii o Harrym Potterze?', answers: ['Durmstrang', 'Beauxbatons', 'Hogwart', 'Ilvermorny'], correctIndex: 2, category: 'Popkultura', difficulty: 'easy' },
+  { id: 'pl-175', question: 'W jakim mieście rozgrywa się akcja serialu "Przyjaciele" (Friends)?', answers: ['Los Angeles', 'Chicago', 'Nowy Jork', 'Boston'], correctIndex: 2, category: 'Popkultura', difficulty: 'easy' },
+  { id: 'pl-176', question: 'Jak ma na imię główna bohaterka "Igrzysk Śmierci"?', answers: ['Katniss Everdeen', 'Hermiona Granger', 'Tris Prior', 'Bella Swan'], correctIndex: 0, category: 'Popkultura', difficulty: 'easy' },
+  { id: 'pl-177', question: 'Który zespół nagrał album "Thriller" (1982)?', answers: ['The Beatles', 'Queen', 'Michael Jackson', 'Prince'], correctIndex: 2, category: 'Popkultura', difficulty: 'easy' },
+  { id: 'pl-178', question: 'W którym roku zadebiutował serwis streamingowy Netflix?', answers: ['1997', '1999', '2005', '2007'], correctIndex: 1, category: 'Popkultura', difficulty: 'medium' },
+  { id: 'pl-179', question: 'Jak nazywa się gra, w której gracze budują ze sześciennych bloków?', answers: ['Roblox', 'Fortnite', 'Minecraft', 'Terraria'], correctIndex: 2, category: 'Popkultura', difficulty: 'easy' },
+  { id: 'pl-180', question: 'Który film animowany Pixara opowiada o szczurze marzącym o gotowaniu?', answers: ['Ratatuj', 'Gotuj jak szczur', 'Chef', 'Kucharz z Paryża'], correctIndex: 0, category: 'Popkultura', difficulty: 'easy' },
+  { id: 'pl-181', question: 'Jak nazywa się superbohater w czerwono-niebieskim kostiumie, który strzela pajęczyną?', answers: ['Batman', 'Spider-Man', 'Daredevil', 'The Flash'], correctIndex: 1, category: 'Popkultura', difficulty: 'easy' },
+  { id: 'pl-182', question: 'W którym polskim mieście odbywa się coroczny festiwal muzyczny Open\'er?', answers: ['Sopot', 'Gdynia', 'Warszawa', 'Kraków'], correctIndex: 1, category: 'Popkultura', difficulty: 'medium' },
+  { id: 'pl-183', question: 'Jak nazywa się platforma do krótkich filmów, popularna szczególnie wśród młodzieży?', answers: ['Instagram', 'Snapchat', 'TikTok', 'Pinterest'], correctIndex: 2, category: 'Popkultura', difficulty: 'easy' },
+
+  // ============================================================
+  // SPORT — easy/medium (10 questions)
+  // ============================================================
+  { id: 'pl-184', question: 'Ile drużyn gra jednocześnie w meczu piłki nożnej?', answers: ['18', '20', '22', '24'], correctIndex: 2, category: 'Sport', difficulty: 'easy' },
+  { id: 'pl-185', question: 'W którym roku Polska zorganizowała Mistrzostwa Europy w piłce nożnej (z Ukrainą)?', answers: ['2008', '2010', '2012', '2016'], correctIndex: 2, category: 'Sport', difficulty: 'easy' },
+  { id: 'pl-186', question: 'Ile punktów zdobywa się za trafienie trójki w koszykówce?', answers: ['2', '3', '4', '5'], correctIndex: 1, category: 'Sport', difficulty: 'easy' },
+  { id: 'pl-187', question: 'Który polaki skoczek narciarski zdobył 4 Turniej Czterech Skoczni w sezonie 2001/2002?', answers: ['Piotr Żyła', 'Kamil Stoch', 'Adam Małysz', 'Dawid Kubacki'], correctIndex: 2, category: 'Sport', difficulty: 'medium' },
+  { id: 'pl-188', question: 'Ile wynosi długość standardowego basenu olimpijskiego (w metrach)?', answers: ['25', '50', '75', '100'], correctIndex: 1, category: 'Sport', difficulty: 'easy' },
+  { id: 'pl-189', question: 'W której dyscyplinie sportowej rywalizuje się o Puchar Davisa?', answers: ['Golf', 'Tenis', 'Squash', 'Badminton'], correctIndex: 1, category: 'Sport', difficulty: 'easy' },
+  { id: 'pl-190', question: 'Który klub piłkarski z Warszawy gra na stadionie przy ul. Łazienkowskiej?', answers: ['Polonia Warszawa', 'Legia Warszawa', 'Wisła Warszawa', 'Lech Warszawa'], correctIndex: 1, category: 'Sport', difficulty: 'easy' },
+  { id: 'pl-191', question: 'Ile meczów rozgrywa się w serii NBA Finals, by wyłonić mistrza?', answers: ['3', '5', '7', '9'], correctIndex: 2, category: 'Sport', difficulty: 'medium' },
+  { id: 'pl-192', question: 'Który Polak zdobył złoty medal olimpijski w chodzie sportowym w Sydney 2000?', answers: ['Robert Korzeniowski', 'Tomasz Majewski', 'Szymon Ziółkowski', 'Piotr Małachowski'], correctIndex: 0, category: 'Sport', difficulty: 'medium' },
+  { id: 'pl-193', question: 'W której grze zespołowej bramkarz może używać rąk do obrony?', answers: ['Piłka nożna', 'Piłka ręczna', 'Piłka wodna', 'Wszystkie powyższe'], correctIndex: 3, category: 'Sport', difficulty: 'easy' },
+
+  // ============================================================
+  // NAUKA — medium/hard (10 questions)
+  // ============================================================
+  { id: 'pl-194', question: 'Jaka jest temperatura wrzenia wody pod normalnym ciśnieniem atmosferycznym?', answers: ['90°C', '95°C', '100°C', '105°C'], correctIndex: 2, category: 'Nauka', difficulty: 'medium' },
+  { id: 'pl-195', question: 'Ile protonów ma atom węgla?', answers: ['4', '6', '8', '12'], correctIndex: 1, category: 'Nauka', difficulty: 'medium' },
+  { id: 'pl-196', question: 'Czym zajmuje się sejsmologia?', answers: ['Badaniem oceanów', 'Badaniem trzęsień ziemi', 'Badaniem klimatu', 'Badaniem gleb'], correctIndex: 1, category: 'Nauka', difficulty: 'medium' },
+  { id: 'pl-197', question: 'Jaka jest prędkość światła w próżni (w przybliżeniu)?', answers: ['300 000 km/s', '150 000 km/s', '450 000 km/s', '30 000 km/s'], correctIndex: 0, category: 'Nauka', difficulty: 'medium' },
+  { id: 'pl-198', question: 'Jak nazywa się organellum komórkowe odpowiedzialne za produkcję energii?', answers: ['Jądro komórkowe', 'Rybosom', 'Mitochondrium', 'Lizosomy'], correctIndex: 2, category: 'Nauka', difficulty: 'medium' },
+  { id: 'pl-199', question: 'Który pierwiastek ma symbol chemiczny "Fe"?', answers: ['Fluor', 'Fosfor', 'Żelazo', 'Francez'], correctIndex: 2, category: 'Nauka', difficulty: 'medium' },
+  { id: 'pl-200', question: 'Ile chromosomów ma typowa ludzka komórka somatyczna?', answers: ['23', '44', '46', '48'], correctIndex: 2, category: 'Nauka', difficulty: 'hard' },
+  { id: 'pl-201', question: 'Czym jest pH = 7?', answers: ['Silna kwasowość', 'Słaba kwasowość', 'Odczyn obojętny', 'Zasadowość'], correctIndex: 2, category: 'Nauka', difficulty: 'medium' },
+  { id: 'pl-202', question: 'Jak nazywa się zjawisko zginania światła przy przejściu przez granicę dwóch ośrodków?', answers: ['Dyfrakcja', 'Odbicie', 'Refrakcja (załamanie)', 'Interferencja'], correctIndex: 2, category: 'Nauka', difficulty: 'hard' },
+  { id: 'pl-203', question: 'Która planeta w Układzie Słonecznym ma największą liczbę księżyców?', answers: ['Jowisz', 'Saturn', 'Uran', 'Neptun'], correctIndex: 1, category: 'Nauka', difficulty: 'hard' },
+
+  // ============================================================
+  // GEOGRAFIA PL — easy/medium (10 questions)
+  // ============================================================
+  { id: 'pl-204', question: 'Jakie jest największe miasto w Polsce pod względem liczby mieszkańców?', answers: ['Kraków', 'Łódź', 'Warszawa', 'Wrocław'], correctIndex: 2, category: 'Geografia', difficulty: 'easy' },
+  { id: 'pl-205', question: 'Jakie morze oblewa Polskę od północy?', answers: ['Morze Czarne', 'Morze Bałtyckie', 'Morze Północne', 'Morze Adriatyckie'], correctIndex: 1, category: 'Geografia', difficulty: 'easy' },
+  { id: 'pl-206', question: 'W którym województwie leży Kraków?', answers: ['Śląskim', 'Świętokrzyskim', 'Małopolskim', 'Podkarpackim'], correctIndex: 2, category: 'Geografia', difficulty: 'easy' },
+  { id: 'pl-207', question: 'Jak nazywa się najdłuższa polska plaża?', answers: ['Plaża w Sopocie', 'Plaża w Kołobrzegu', 'Plaża na Helu', 'Plaża w Łebie'], correctIndex: 3, category: 'Geografia', difficulty: 'medium' },
+  { id: 'pl-208', question: 'Które polskie miasto leży nad Odrą i jest stolicą Dolnego Śląska?', answers: ['Opole', 'Gliwice', 'Wrocław', 'Zielona Góra'], correctIndex: 2, category: 'Geografia', difficulty: 'easy' },
+  { id: 'pl-209', question: 'Jak nazywają się polskie góry na granicy z Czechami, słynące z narciarstwa?', answers: ['Tatry', 'Bieszczady', 'Sudety', 'Pieniny'], correctIndex: 2, category: 'Geografia', difficulty: 'easy' },
+  { id: 'pl-210', question: 'W którym województwie leży Gdańsk?', answers: ['Kujawsko-pomorskim', 'Pomorskim', 'Zachodniopomorskim', 'Warmińsko-mazurskim'], correctIndex: 1, category: 'Geografia', difficulty: 'easy' },
+  { id: 'pl-211', question: 'Jak nazywa się polska puszcza, w której żyją wolne żubry?', answers: ['Puszcza Kampinoska', 'Puszcza Białowieska', 'Puszcza Knyszyńska', 'Puszcza Augustowska'], correctIndex: 1, category: 'Geografia', difficulty: 'easy' },
+  { id: 'pl-212', question: 'Które polskie miasto jest nazywane "miastem czterech kultur"?', answers: ['Warszawa', 'Kraków', 'Łódź', 'Lublin'], correctIndex: 2, category: 'Geografia', difficulty: 'medium' },
+  { id: 'pl-213', question: 'Jaka rzeka przepływa przez Kraków?', answers: ['Odra', 'Bug', 'Wisła', 'San'], correctIndex: 2, category: 'Geografia', difficulty: 'easy' },
 ];
 
 // ===== MINI GAMES =====
