@@ -13,70 +13,111 @@ export default function LobbyScreen({ room, playerId, onStartGame, onLeave }: Pr
   const canStart = room.players.length >= 2;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md animate-slide-up">
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Scanline overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-scanlines opacity-[0.04] z-10" />
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-64 bg-[#FFE033] opacity-[0.03] blur-3xl" />
+
+      <div className="w-full max-w-md animate-slide-up relative z-20">
+        {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">Poczekalnia</h2>
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl border border-white/20">
-            <span className="text-purple-200 text-sm">Kod pokoju:</span>
-            <span className="text-2xl font-mono font-bold text-white tracking-widest">{room.id}</span>
+          <h2 className="font-orbitron text-3xl font-black uppercase tracking-widest text-[#FFE033] glow-text mb-3">
+            Poczekalnia
+          </h2>
+          <div className="inline-flex items-center gap-3 px-5 py-2 bg-[#12121a] border border-[#00F5FF]/40 shadow-[0_0_12px_rgba(0,245,255,0.2)]">
+            <span className="text-[#00F5FF]/60 text-xs uppercase tracking-widest">Kod pokoju</span>
+            <span className="font-orbitron text-2xl font-bold text-[#00F5FF] tracking-[0.4em] glow-text-cyan">
+              {room.id}
+            </span>
           </div>
-          <p className="text-purple-300 text-sm mt-2">Podaj ten kod innym graczom</p>
+          <p className="text-white/30 text-xs mt-3 uppercase tracking-widest">Podaj ten kod innym graczom</p>
         </div>
 
-        <div className="bg-white/10 rounded-xl p-6 mb-6 border border-white/20">
-          <h3 className="text-white font-semibold mb-4">Gracze ({room.players.length}/6)</h3>
-          <div className="space-y-3 stagger-children">
+        {/* Players list */}
+        <div className="bg-[#12121a] border border-[#FFE033]/20 p-5 mb-5">
+          <h3 className="font-orbitron text-[#FFE033]/80 text-xs font-bold uppercase tracking-widest mb-4">
+            Gracze ({room.players.length}/6)
+          </h3>
+          <div className="space-y-2 stagger-children">
             {room.players.map((player, index) => {
               const avatar = AVATARS.find((a) => a.id === player.avatarId) || AVATARS[0];
               return (
-                <div key={player.id} className="flex items-center gap-3 p-3 bg-white/10 rounded-lg animate-scale-in">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-                    style={{ backgroundColor: avatar.color + '33', border: `2px solid ${avatar.color}` }}>
+                <div
+                  key={player.id}
+                  className="flex items-center gap-3 p-3 bg-[#0a0a0f] border border-[#FFE033]/10 animate-scale-in"
+                >
+                  <div
+                    className="w-12 h-12 flex items-center justify-center text-2xl flex-shrink-0"
+                    style={{
+                      backgroundColor: avatar.color + '22',
+                      border: `2px solid ${avatar.color}`,
+                      boxShadow: `0 0 8px ${avatar.color}44`,
+                    }}
+                  >
                     {avatar.emoji}
                   </div>
                   <div className="flex-1 text-left">
-                    <span className="text-white font-medium">{player.name}</span>
-                    {player.id === playerId && <span className="text-purple-300 text-xs ml-2">(Ty)</span>}
+                    <span className="text-white font-semibold tracking-wide">{player.name}</span>
+                    {player.id === playerId && (
+                      <span className="text-[#00F5FF]/60 text-xs ml-2 uppercase tracking-widest">(Ty)</span>
+                    )}
                   </div>
                   {index === 0 && (
-                    <span className="text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded-full">Host</span>
+                    <span className="text-xs font-orbitron font-bold uppercase tracking-widest text-[#FFE033] border border-[#FFE033]/40 px-2 py-1">
+                      Host
+                    </span>
                   )}
                 </div>
               );
             })}
             {Array.from({ length: Math.max(0, 2 - room.players.length) }).map((_, i) => (
-              <div key={`empty-${i}`} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border-2 border-dashed border-white/20">
-                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                  <span className="text-white/30 text-xl">?</span>
+              <div
+                key={`empty-${i}`}
+                className="flex items-center gap-3 p-3 bg-[#0a0a0f] border-2 border-dashed border-white/10"
+              >
+                <div className="w-12 h-12 flex items-center justify-center border border-white/10 bg-white/5 flex-shrink-0">
+                  <span className="text-white/20 text-xl">?</span>
                 </div>
-                <span className="text-white/40">Oczekiwanie na gracza...</span>
+                <span className="text-white/25 text-sm tracking-wide">Oczekiwanie na gracza...</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/10">
-          <p className="text-purple-300 text-xs text-center">
-            Format gry: 3x pytania + minigra + 3x pytania + minigra + 3x pytania + Piramida Wiedzy
+        {/* Game format info */}
+        <div className="bg-[#12121a] border border-white/5 p-4 mb-6">
+          <p className="text-white/30 text-xs text-center leading-relaxed">
+            Format gry: 3× pytania + minigra + 3× pytania + minigra + 3× pytania + Piramida Wiedzy
           </p>
-          <p className="text-purple-400 text-xs text-center mt-1">
-            2-6 graczy | Wybiór kategorii | Zagrywki | Mini-gry
+          <p className="text-[#FFE033]/30 text-xs text-center mt-1 uppercase tracking-widest">
+            2–6 graczy · wybór kategorii · zagrywki · mini-gry
           </p>
         </div>
 
+        {/* Start / waiting */}
         {isHost ? (
-          <button onClick={onStartGame} disabled={!canStart}
-            className={`w-full py-4 font-bold text-lg rounded-xl transition-all shadow-lg ${
-              canStart ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white animate-pulse-glow' : 'bg-white/10 text-white/40 cursor-not-allowed'
-            }`}>
+          <button
+            onClick={onStartGame}
+            disabled={!canStart}
+            className={`w-full py-4 font-orbitron font-bold text-lg uppercase tracking-widest transition-all duration-200 ${
+              canStart
+                ? 'border-2 border-[#39FF14] text-[#39FF14] hover:bg-[#39FF14] hover:text-[#0a0a0f] hover:shadow-[0_0_24px_rgba(57,255,20,0.5)] animate-pulse-glow'
+                : 'border-2 border-white/10 text-white/20 cursor-not-allowed'
+            }`}
+          >
             {canStart ? `Rozpocznij Grę! (${room.players.length} graczy)` : 'Czekam na drugiego gracza...'}
           </button>
         ) : (
-          <div className="text-center py-4 text-purple-300 animate-float">Oczekiwanie na rozpoczęcie gry przez hosta...</div>
+          <div className="text-center py-4 text-[#00F5FF]/60 text-sm uppercase tracking-widest animate-float">
+            Oczekiwanie na rozpoczęcie gry przez hosta...
+          </div>
         )}
 
-        <button onClick={onLeave} className="w-full mt-4 py-3 text-purple-300 hover:text-white transition-colors">
+        <button
+          onClick={onLeave}
+          className="w-full mt-4 py-3 text-white/30 hover:text-[#FF2D78] uppercase tracking-widest text-sm transition-colors duration-200"
+        >
           Opuść pokój
         </button>
       </div>
