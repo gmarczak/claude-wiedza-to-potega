@@ -48,14 +48,26 @@ export default function DisplayApp() {
     const upper = id.toUpperCase();
     setRoomId(upper);
     setError(null);
-    socket.connect();
-    socket.emit('display:join', { roomId: upper });
+    if (socket.connected) {
+      socket.emit('display:join', { roomId: upper });
+    } else {
+      socket.once('connect', () => {
+        socket.emit('display:join', { roomId: upper });
+      });
+      socket.connect();
+    }
   };
 
   useEffect(() => {
     if (urlRoom) {
-      socket.connect();
-      socket.emit('display:join', { roomId: urlRoom });
+      if (socket.connected) {
+        socket.emit('display:join', { roomId: urlRoom });
+      } else {
+        socket.once('connect', () => {
+          socket.emit('display:join', { roomId: urlRoom });
+        });
+        socket.connect();
+      }
     }
 
     socket.on('room:joined', (roomState: RoomState) => {
