@@ -1,6 +1,6 @@
 # Dokumentacja Techniczna — Wiedza to Potęga
 
-Multiplayer quiz online dla dwóch graczy inspirowany teleturniejem "Wiedza to Potęga" (PS4 PlayLink).
+Multiplayer quiz online dla 2-6 graczy inspirowany teleturniejem "Wiedza to Potęga" (PS4 PlayLink).
 
 ---
 
@@ -24,10 +24,10 @@ Multiplayer quiz online dla dwóch graczy inspirowany teleturniejem "Wiedza to P
 
 ## Przegląd projektu
 
-Gra przeglądarkowa dla dwóch graczy rozgrywana w czasie rzeczywistym. Gracze łączą się za pomocą 6-znakowego kodu pokoju. Rozgrywka składa się z rund pytań, mini-gier między rundami oraz finałowej Piramidy Wiedzy. Zwycięzca otrzymuje "Legendarny Zwój Wiedzy" z ciekawostką.
+Gra przeglądarkowa dla 2-6 graczy rozgrywana w czasie rzeczywistym. Gracze łączą się za pomocą 6-znakowego kodu pokoju. Rozgrywka składa się z rund pytań, mini-gier między rundami oraz finałowej Piramidy Wiedzy. Zwycięzca otrzymuje "Legendarny Zwój Wiedzy" z ciekawostką.
 
 **Główne funkcje:**
-- Pokoje z kodem (do 2 graczy)
+- Pokoje z kodem (2-6 graczy)
 - Głosowanie na kategorię pytań z opcją "przełamania"
 - 6 mocy utrudniających grę przeciwnikowi lub wzmacniających siebie
 - Bonus za szybkość odpowiedzi (do +10 pkt)
@@ -44,7 +44,7 @@ Gra przeglądarkowa dla dwóch graczy rozgrywana w czasie rzeczywistym. Gracze �
 
 | Warstwa    | Technologie                                      |
 |------------|--------------------------------------------------|
-| Frontend   | React 18, TypeScript, Vite, Tailwind CSS         |
+| Frontend   | React 19, TypeScript, Vite, Tailwind CSS, Three.js (React Three Fiber) |
 | Backend    | Node.js, Express, Socket.io 4                    |
 | Pytania    | Wbudowana baza PL + Open Trivia DB API (zewnętrzne) |
 | Deployment | Frontend → Vercel, Backend → Railway / Render    |
@@ -55,41 +55,78 @@ Gra przeglądarkowa dla dwóch graczy rozgrywana w czasie rzeczywistym. Gracze �
 
 ```
 wiedza-to-potega/
-├── package.json            # Root — skrypty dev/build
+├── package.json            # Root — skrypty dev/build/test
 ├── vercel.json             # Konfiguracja Vercel (frontend)
 ├── railway.json            # Konfiguracja Railway (backend)
 ├── render.yaml             # Konfiguracja Render (backend)
+├── CLAUDE.md               # Instrukcje implementacji trybu TV
+├── DOKUMENTACJA.md         # Dokumentacja techniczna
+│
+├── .github/
+│   └── workflows/
+│       └── test.yml        # CI — GitHub Actions (testy na push/PR)
+│
+├── docs/
+│   └── screenshots/        # Screenshoty gry (używane w README)
 │
 ├── client/                 # Aplikacja React (frontend)
 │   ├── package.json
 │   ├── vite.config.ts
+│   ├── vitest.config.ts
 │   ├── tailwind.config.js
 │   └── src/
 │       ├── main.tsx            # Punkt wejścia React
 │       ├── App.tsx             # Główny komponent, zarządzanie stanem gry
+│       ├── DisplayApp.tsx      # Komponent trybu TV/Display
 │       ├── socket.ts           # Konfiguracja klienta Socket.io
 │       ├── sounds.ts           # Efekty dźwiękowe
 │       ├── types.ts            # Typy TypeScript (współdzielone z backendem)
-│       └── components/
-│           ├── HomeScreen.tsx          # Ekran startowy (wybór awatara, imię, pokój)
-│           ├── LobbyScreen.tsx         # Poczekalnia (oczekiwanie na graczy)
-│           ├── CountdownScreen.tsx     # Odliczanie przed grą
-│           ├── CategoryVoteScreen.tsx  # Głosowanie na kategorię
-│           ├── PowerUpScreen.tsx       # Wybór mocy
-│           ├── QuestionScreen.tsx      # Ekran pytania (z obsługą power-upów)
-│           ├── RevealScreen.tsx        # Ujawnienie odpowiedzi i punktów
-│           ├── MiniGameScreen.tsx      # Mini-gry (łączenie par / sortowanie)
-│           ├── PyramidScreen.tsx       # Piramida Wiedzy (finał)
-│           ├── FinishedScreen.tsx      # Ekran końcowy (zwycięzca, zwój)
-│           └── HostComment.tsx         # Dymek z komentarzem prowadzącego
+│       ├── components/         # Ekrany gracza
+│       │   ├── HomeScreen.tsx          # Ekran startowy (wybór awatara, imię, pokój)
+│       │   ├── LobbyScreen.tsx         # Poczekalnia (oczekiwanie na graczy)
+│       │   ├── CountdownScreen.tsx     # Odliczanie przed grą
+│       │   ├── CategoryVoteScreen.tsx  # Głosowanie na kategorię
+│       │   ├── PowerUpScreen.tsx       # Wybór mocy
+│       │   ├── QuestionScreen.tsx      # Ekran pytania (z obsługą power-upów)
+│       │   ├── RevealScreen.tsx        # Ujawnienie odpowiedzi i punktów
+│       │   ├── MiniGameScreen.tsx      # Mini-gry (łączenie par / sortowanie)
+│       │   ├── PyramidScreen.tsx       # Piramida Wiedzy (finał)
+│       │   ├── FinishedScreen.tsx      # Ekran końcowy (zwycięzca, zwój)
+│       │   └── HostComment.tsx         # Dymek z komentarzem prowadzącego
+│       ├── display/            # Ekrany trybu TV (2D)
+│       │   ├── DisplayLobbyScreen.tsx
+│       │   ├── DisplayCountdownScreen.tsx
+│       │   ├── DisplayCategoryScreen.tsx
+│       │   ├── DisplayQuestionScreen.tsx
+│       │   ├── DisplayRevealScreen.tsx
+│       │   └── DisplayFinishedScreen.tsx
+│       ├── display3d/          # Ekrany trybu TV (3D — Three.js)
+│       │   ├── GameScene.tsx           # Główna scena 3D
+│       │   ├── StudioStage.tsx         # Studio TV w 3D
+│       │   ├── Character3D.tsx         # Postacie 3D graczy
+│       │   ├── QuestionBoard.tsx       # Tablica pytań 3D
+│       │   ├── AnswerPanels.tsx        # Panele odpowiedzi 3D
+│       │   ├── TimerBar3D.tsx          # Timer 3D
+│       │   ├── ScoreBoard3D.tsx        # Tablica wyników 3D
+│       │   ├── Pyramid3D.tsx           # Piramida 3D
+│       │   ├── CategoryCards3D.tsx     # Karty kategorii 3D
+│       │   ├── CameraController.tsx    # Kontroler kamery
+│       │   ├── ParticleEffects.tsx     # Efekty cząsteczkowe
+│       │   ├── CountdownOverlay.tsx    # Overlay odliczania
+│       │   └── transitions.ts          # Animacje przejść
+│       └── __tests__/          # Testy frontend (Vitest)
 │
 └── server/                 # Serwer Node.js (backend)
     ├── package.json
     ├── tsconfig.json
+    ├── vitest.config.ts
     └── src/
-        ├── index.ts            # Serwer Express + logika Socket.io
+        ├── index.ts            # Punkt wejścia serwera
+        ├── app.ts              # Logika gry (Express + Socket.io)
         ├── types.ts            # Typy TypeScript (modele danych, eventy)
-        └── questions.ts        # Baza pytań, mini-gry, komentarze prowadzącego
+        ├── questions.ts        # Baza pytań, mini-gry, komentarze prowadzącego
+        ├── utils.ts            # Funkcje pomocnicze
+        └── __tests__/          # Testy backend (Vitest)
 ```
 
 ---
@@ -97,16 +134,17 @@ wiedza-to-potega/
 ## Architektura systemu
 
 ```
-Przeglądarka Gracza 1          Przeglądarka Gracza 2
-     (React)                        (React)
-        │                               │
-        └──────────── Socket.io ────────┘
-                           │
-                    Serwer Node.js
-                    (Express + Socket.io)
-                           │
-                    Mapa pokoi (RAM)
-                    rooms: Map<roomId, Room>
+Ekran TV (Display)     Gracze 1-6 (telefony/przeglądarki)
+  ?mode=display              ?mode=player
+     (React + Three.js)      (React)
+        │                       │
+        └────── Socket.io ──────┘
+                     │
+              Serwer Node.js
+              (Express + Socket.io)
+                     │
+              Mapa pokoi (RAM)
+              rooms: Map<roomId, Room>
 ```
 
 **Zasady:**
@@ -271,6 +309,7 @@ Im szybciej odpowiesz, tym więcej punktów bonus.
 | `game:answer`          | `answerIndex: number`                                 | Wyślij odpowiedź               |
 | `game:minigame-result` | `score: number`                                       | Wynik mini-gry                 |
 | `game:pyramid-answer`  | `answerIndex: number`                                 | Odpowiedź w Piramidzie         |
+| `display:join`         | `{ roomId: string }`                                  | Display dołącza jako obserwator|
 
 ### Eventy wysyłane przez serwer → klienci
 
@@ -333,7 +372,8 @@ npm run dev
 | `npm run dev:server` | Tylko backend (tsx watch)               |
 | `npm run build`      | Zbuduj frontend do `client/dist/`       |
 | `npm run start`      | Uruchom backend produkcyjnie            |
-| `npm run install:all`| Zainstaluj zależności we wszystkich katologach |
+| `npm run install:all`| Zainstaluj zależności we wszystkich katalogach |
+| `npm run test`       | Uruchom testy (server + client)                 |
 
 ---
 
