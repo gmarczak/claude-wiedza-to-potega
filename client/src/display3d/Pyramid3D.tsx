@@ -3,7 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import Character3D from './Character3D';
-import type { PlayerInfo } from '../types';
 import { AVATARS } from '../types';
 
 interface Pyramid3DProps {

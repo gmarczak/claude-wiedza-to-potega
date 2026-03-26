@@ -305,7 +305,7 @@ function SceneContent(props: GameSceneProps) {
 
       {/* ── FINISHED ─────────────────────────────── */}
       {phase === 'finished' && result && (
-        <FinishedScene result={result} playerPositions={playerPositions} />
+        <FinishedScene result={result} />
       )}
     </>
   );
@@ -437,10 +437,8 @@ function MiniGameOverlay({
 
 function FinishedScene({
   result,
-  playerPositions,
 }: {
   result: GameResult;
-  playerPositions: { id: string; avatarId: string; name: string; score: number; pos: [number, number, number] }[];
 }) {
   const sorted = [...result.players].sort((a, b) => b.score - a.score);
 
