@@ -44,7 +44,7 @@ Zwycięzca otrzymuje Legendarny Zwój Wiedzy z ciekawostką!
 
 - **2-6 graczy** w czasie rzeczywistym przez Socket.io
 - Głosowanie na kategorię pytań (z opcją przełamania)
-- 4 zagrywki (power-upy): Szlam, Dziobak, Lód, Bomba
+- 6 zagrywek (power-upów): Szlam, Dziobak, Lód, Bomba + Podwójne Punkty, 50/50
 - Punkty za szybkość odpowiedzi (do +10 bonus)
 - Mini-gry między rundami (łączenie par, sortowanie)
 - Piramida Wiedzy — wielki finał
@@ -52,13 +52,15 @@ Zwycięzca otrzymuje Legendarny Zwój Wiedzy z ciekawostką!
 - Komentarze prowadzącego "Maks"
 - Pytania z obrazkami
 - Wbudowane pytania PL + Open Trivia DB API
+- Tryb TV/Display (`?mode=display`) — 3D studio z postaciami na dużym ekranie (Three.js)
 - Format gry: 3x pytania + minigra + 3x pytania + minigra + 3x pytania + Piramida Wiedzy
 
 ## Technologie
 
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS
+- **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS + Three.js (React Three Fiber)
 - **Backend**: Node.js + Express + Socket.io
 - **Pytania**: Wbudowane pytania PL + Open Trivia DB API
+- **Testy**: Vitest + React Testing Library + GitHub Actions CI
 
 ## Uruchomienie lokalne
 
@@ -68,6 +70,9 @@ npm run install:all
 
 # Uruchom (frontend + backend)
 npm run dev
+
+# Uruchom testy
+npm run test
 ```
 
 - Frontend: http://localhost:5173
