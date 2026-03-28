@@ -47,10 +47,10 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
           <p className="font-orbitron text-2xl font-bold uppercase tracking-[0.3em] text-[#00F5FF] glow-text-cyan mt-1">
             to Potęga
           </p>
-          <div className="mt-3 inline-block px-4 py-1 border border-[#FFE033]/30 bg-[#FFE033]/5">
-            <span className="text-xs font-semibold tracking-widest uppercase text-[#FFE033]/70">
-              2–6 graczy
-            </span>
+          <div className="mt-4 flex justify-center gap-3">
+            <span className="text-2xl">🧠</span>
+            <span className="text-2xl">⚡</span>
+            <span className="text-2xl">🏆</span>
           </div>
         </div>
 
@@ -61,6 +61,27 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
         )}
 
         {mode === 'menu' && (
+          <div className="space-y-5 animate-slide-up">
+            <p className="text-white/50 text-center text-sm tracking-wide leading-relaxed">
+              Quizowa gra towarzyska dla 2–6 graczy.<br />
+              Sprawdź kto wie więcej!
+            </p>
+            <button
+              onClick={() => setMode('create')}
+              className="w-full py-5 border-2 border-[#FFE033] text-[#FFE033] font-bold text-xl uppercase tracking-widest hover:bg-[#FFE033] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(255,224,51,0.5)] transition-all duration-200 font-orbitron"
+            >
+              Stwórz Pokój
+            </button>
+            <button
+              onClick={() => setMode('join')}
+              className="w-full py-5 border-2 border-[#00F5FF] text-[#00F5FF] font-bold text-xl uppercase tracking-widest hover:bg-[#00F5FF] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(0,245,255,0.5)] transition-all duration-200 font-orbitron"
+            >
+              Dołącz do Pokoju
+            </button>
+          </div>
+        )}
+
+        {mode === 'create' && (
           <div className="space-y-4 animate-slide-up">
             <input
               type="text"
@@ -94,25 +115,6 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
               </div>
             </div>
 
-            <button
-              onClick={() => setMode('create')}
-              disabled={!playerName.trim()}
-              className="w-full py-4 border-2 border-[#FFE033] text-[#FFE033] font-bold text-lg uppercase tracking-widest hover:bg-[#FFE033] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(255,224,51,0.5)] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed font-orbitron"
-            >
-              Stwórz Pokój
-            </button>
-            <button
-              onClick={() => setMode('join')}
-              disabled={!playerName.trim()}
-              className="w-full py-4 border-2 border-[#00F5FF] text-[#00F5FF] font-bold text-lg uppercase tracking-widest hover:bg-[#00F5FF] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(0,245,255,0.5)] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed font-orbitron"
-            >
-              Dołącz do Pokoju
-            </button>
-          </div>
-        )}
-
-        {mode === 'create' && (
-          <div className="space-y-4 animate-slide-up">
             <div className="bg-[#12121a] border border-[#FFE033]/20 p-4 space-y-4">
               <h3 className="font-orbitron text-[#FFE033] font-bold text-base uppercase tracking-widest">
                 Ustawienia gry
@@ -153,7 +155,8 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
             </div>
             <button
               onClick={handleCreate}
-              className="w-full py-4 border-2 border-[#39FF14] text-[#39FF14] font-bold text-lg uppercase tracking-widest hover:bg-[#39FF14] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)] transition-all duration-200 font-orbitron"
+              disabled={!playerName.trim()}
+              className="w-full py-4 border-2 border-[#39FF14] text-[#39FF14] font-bold text-lg uppercase tracking-widest hover:bg-[#39FF14] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed font-orbitron"
             >
               Stwórz Pokój
             </button>
@@ -170,6 +173,38 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
           <div className="space-y-4 animate-slide-up">
             <input
               type="text"
+              placeholder="Twoje imię..."
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              maxLength={20}
+              className="w-full px-4 py-3 bg-[#12121a] border border-[#FFE033]/30 text-white placeholder-white/30 focus:outline-none focus:border-[#FFE033] focus:shadow-[0_0_10px_rgba(255,224,51,0.3)] text-lg tracking-wide transition-all duration-200"
+            />
+
+            {/* Avatar selection */}
+            <div className="bg-[#12121a] border border-[#FFE033]/20 p-4">
+              <p className="text-[#FFE033]/60 text-xs mb-3 font-semibold uppercase tracking-widest">
+                Wybierz postać
+              </p>
+              <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto">
+                {AVATARS.map((avatar) => (
+                  <button
+                    key={avatar.id}
+                    onClick={() => setSelectedAvatar(avatar.id)}
+                    className={`flex flex-col items-center p-2 transition-all duration-150 ${
+                      selectedAvatar === avatar.id
+                        ? 'bg-[#FFE033]/10 border border-[#FFE033] shadow-[0_0_8px_rgba(255,224,51,0.4)]'
+                        : 'bg-white/5 border border-transparent hover:border-[#FFE033]/30 hover:bg-white/10'
+                    }`}
+                  >
+                    <span className="text-3xl mb-1">{avatar.emoji}</span>
+                    <span className="text-[10px] text-white/50 tracking-wide">{avatar.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <input
+              type="text"
               placeholder="Kod pokoju (np. ABC123)"
               value={roomCode}
               onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
@@ -178,7 +213,7 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
             />
             <button
               onClick={handleJoin}
-              disabled={!roomCode.trim()}
+              disabled={!playerName.trim() || !roomCode.trim()}
               className="w-full py-4 border-2 border-[#39FF14] text-[#39FF14] font-bold text-lg uppercase tracking-widest hover:bg-[#39FF14] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed font-orbitron"
             >
               Dołącz
