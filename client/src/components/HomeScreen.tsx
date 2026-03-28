@@ -78,6 +78,19 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }: Props) {
             >
               Dołącz do Pokoju
             </button>
+
+            <div className="pt-4 border-t border-white/10">
+              <button
+                onClick={() => { window.location.href = '/?mode=display'; }}
+                className="w-full py-4 border-2 border-[#a855f7] text-[#a855f7] font-bold text-base uppercase tracking-widest hover:bg-[#a855f7] hover:text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition-all duration-200 font-orbitron flex items-center justify-center gap-3"
+              >
+                <span className="text-xl">📺</span>
+                Tryb TV
+              </button>
+              <p className="text-white/30 text-xs text-center mt-2 tracking-wide">
+                Wyświetl grę na dużym ekranie
+              </p>
+            </div>
           </div>
         )}
 
